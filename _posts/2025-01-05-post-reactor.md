@@ -35,7 +35,7 @@ The Reactor Pattern is a design pattern for handling servcie requets delivered c
 ## Simplifed Reactor Framework implementation
 A simplified Reactor framework has been implemented to help understand the Ractor pattern and to understand how to apply it in the framework. The source code of implementation is available on my [Git Repoisitory](https://github.com/yjung93/study_reactor_1_0)  This implementation retains the core architectural principles of ACE framework but removes unnecessary complexity for learning purposes.  
 
-The relationship between classes in the Simplifed Reactor Framework ss shown in the following diagram.
+The relationship between classes in the Simplifed Reactor Framework is shown in the following diagram.
 
 ![alt text](/assets/images/reactor_class_diagram_v_1_1.jpg)
 
