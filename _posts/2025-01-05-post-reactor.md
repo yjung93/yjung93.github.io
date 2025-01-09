@@ -10,13 +10,15 @@ tags:
 - [Overview](#overview)
 - [Reacter Pattern](#reacter-pattern)
 - [Simplifed Reactor Framework implementation](#simplifed-reactor-framework-implementation)
-  - [Key components](#key-components)
-  - [Reactor class](#reactor-class)
-  - [EventHandler class](#eventhandler-class)
-- [Example application using simplifed Reactor Framework](#example-application-using-simplifed-reactor-framework)
-  - [Overview](#overview-1)
-  - [Server](#server)
-  - [Client](#client)
+  - [Event infrastructure layer classes](#event-infrastructure-layer-classes)
+    - [Reactor](#reactor)
+    - [Event Handler](#event-handler)
+  - [Application layer classes](#application-layer-classes)
+    - [Server application](#server-application)
+      - [Acceptor](#acceptor)
+      - [ServerEventHandler](#servereventhandler)
+    - [Client application](#client-application)
+  - [How it works](#how-it-works)
 
 
 ## Overview
@@ -33,32 +35,79 @@ The Reactor Pattern is a design pattern for handling servcie requets delivered c
 ## Simplifed Reactor Framework implementation
 A simplified Reactor framework has been implemented to help understand the Ractor pattern and to understand how to apply it in the framework. The source code of implementation is available on my [Git Repoisitory](https://github.com/yjung93/study_reactor_1_0)  This implementation retains the core architectural principles of ACE framework but removes unnecessary complexity for learning purposes.  
 
-### Key components
-
-- **Reactor**: Manages and dispatches events to appropriate handlers
-- **Event Demultiplexer**: Waits for events and notifies the Reactor. In this implementation this part is implemented in Reactor component using selecor.
-- **Event Handler**: Perform actions in response to events
-
-The relationship between classes in the Simplifed Reactor Framework as shown in the following diagram.
+The relationship between classes in the Simplifed Reactor Framework ss shown in the following diagram.
 
 ![alt text](/assets/images/reactor_class_diagram_v_1_1.jpg)
 
-These classes plays the following role in accordance with the Reactor Pattern.
-- **Event infrastructure layer classes**  etects and demultiplexes events to eventhandler and then dispatch corresponding eventhook method of event handler implemented in applcation. it provides application indepentent approach for handling event.
+These classes play the following role in accordance with the Reactor Pattern.
+- **Event infrastructure layer classes**  detects and demultiplexes events to eventhandler and then dispatch corresponding eventhook method of event handler implemented in applcation. it provides application indepentent approach for handling event.
 
-- **Application layer classes** performs appliation-defined processing by implementing event hook method. Applicationlayer classes are desencants of event handler class.
+- **Application layer classes** performs appliation-defined processing by implementing event hook method. Application layer classes are desencants of event handler class.
   
 
-### Reactor class
 
-### EventHandler class
+### Event infrastructure layer classes
 
-## Example application using simplifed Reactor Framework
-### Overview
+#### Reactor
+- Manages and dispatches events to appropriate handlers
+- Implements the select() system call to monitor multiple sockets for activity
+
+```cpp
+class Reactor {
+public:
+    int runReactorEventLoop();
+    int registerHandler(EventHandler* handler, ReactorMask mask);
+    int removeHandler(EventHandler* handler);
+private:
+    int handleEvents();
+};
+
+```
+#### Event Handler
+- Perform actions in response to events
+
+```cpp
+class EventHandler {
+public:
+    virtual int handleInput(int fd);
+    virtual ~EventHandler();
+};
+```
+### Application layer classes
+
+#### Server application
 
 ![alt text](/assets/images/example_reactor.png)
 
+##### Acceptor
+- Responsible for accepting incoming client connections and creating corresponding ServerEventHandler instances.
 
-### Server
-### Client
+```cpp
+class Acceptor : public EventHandler {
+public:
+    void open();
+    int handleInput(int fd);
+};
+
+```
+##### ServerEventHandler
+- Handles communication with individual clients. It echoes back received messages to demonstrate the functionality
+ 
+```cpp
+class ServerEventHandler : public EventHandler {
+public:
+    int handleInput(int fd);
+};
+```
+
+#### Client application
+- Communicates with server application for demonstration. it sends message user typed to server application and shows responsed message from the server application.
+- It is not implemented using framework.
+
+### How it works
+- The Acceptor listens for new client connections. When a connection is established, it creates a ServerEventHandler and registers it with the Reactor.
+- The Reactor monitors all registered event handlers using the select() system call and delegates events to their respective handlers.
+- The ServerEventHandler processes client messages and echoes them back​
+
+![alt text](/assets/images/example_reactor_Sequence.png)
 
