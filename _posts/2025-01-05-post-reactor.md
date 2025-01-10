@@ -6,6 +6,7 @@ categories:
 tags:
   - Reactor
 ---
+
 **Table of Contents**
 - [Overview](#overview)
 - [Reacter Pattern](#reacter-pattern)
@@ -22,10 +23,10 @@ tags:
 
 
 ## Overview
-This page introduces the "Reactor Pattern", a powerfull design pattern widely used in high-performance networking application. We will exploer this pattern through a simplifed implementation inspired by [the Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html) project.
+This page introduces the "Reactor Pattern", a powerfull design pattern widely used in high-performance networking application. We will explore this pattern through a simplifed implementation inspired by [the Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html) project.
 
 ## Reacter Pattern
-The Reactor Pattern is a design pattern for handling servcie requets delivered concurrently to an application by one or more clients. It efficiently dimultiplex and dispatch events to appropreate handler. It provides the following benifits.
+The Reactor Pattern is a design pattern for handling servcie requests delivered concurrently to an application by one or more clients. It efficiently dimultiplexes and dispatches events to appropreate handler. It provides the following benifits.
 
 - **Efficiency**: Handles multiple events using a single thread, reducing overhead.
 - **Scalability**: Suitable for systems with many simultaneous connections.
@@ -33,16 +34,16 @@ The Reactor Pattern is a design pattern for handling servcie requets delivered c
 
 
 ## Simplifed Reactor Framework implementation
-A simplified Reactor framework has been implemented to help understand the Ractor pattern and to understand how to apply it in the framework. The source code of implementation is available on my [Git Repoisitory](https://github.com/yjung93/study_reactor_1_0)  This implementation retains the core architectural principles of ACE framework but removes unnecessary complexity for learning purposes.  
+A simplified Reactor framework has been implemented to help understand the ractor pattern and to understand how to apply it in the framework. The source code of implementation is available on my [Git Repoisitory](https://github.com/yjung93/study_reactor_1_0)  This implementation retains the core architectural principles of ACE framework but removes unnecessary complexity for learning purposes.  
 
 The relationship between classes in the Simplifed Reactor Framework is shown in the following diagram.
 
 ![alt text](/assets/images/reactor_class_diagram_v_1_1.jpg)
 
 These classes play the following role in accordance with the Reactor Pattern.
-- **Event infrastructure layer classes**  detects and demultiplexes events to eventhandler and then dispatch corresponding eventhook method of event handler implemented in applcation. it provides application indepentent approach for handling event.
+- **Event infrastructure layer classes**  detects and demultiplexes events to eventhandler and then dispatches corresponding eventhook method of event handler implemented in applcation. it provides an application-independent approach for handling the event.
 
-- **Application layer classes** performs appliation-defined processing by implementing event hook method. Application layer classes are desencants of event handler class.
+- **Application layer classes** performs application-defined processing by implementing event hook method. Application layer classes are desencants of event handler class.
   
 
 
@@ -61,7 +62,6 @@ public:
 private:
     int handleEvents();
 };
-
 ```
 #### Event Handler
 - Perform actions in response to events
@@ -88,7 +88,6 @@ public:
     void open();
     int handleInput(int fd);
 };
-
 ```
 ##### ServerEventHandler
 - Handles communication with individual clients. It echoes back received messages to demonstrate the functionality
@@ -101,7 +100,7 @@ public:
 ```
 
 #### Client application
-- Communicates with server application for demonstration. it sends message user typed to server application and shows responsed message from the server application.
+- Communicates with server application for demonstration. it sends message user typed to server application and shows responded message from the server application.
 - It is not implemented using framework.
 
 ### How it works
