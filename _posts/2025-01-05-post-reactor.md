@@ -11,6 +11,7 @@ tags:
 - [Overview](#overview)
 - [Reacter Pattern](#reacter-pattern)
 - [Simplifed Reactor Framework implementation](#simplifed-reactor-framework-implementation)
+  - [Structure](#structure)
   - [Event infrastructure layer classes](#event-infrastructure-layer-classes)
     - [Reactor](#reactor)
     - [Event Handler](#event-handler)
@@ -44,7 +45,25 @@ These classes play the following role in accordance with the Reactor Pattern.
 
 - **Application layer classes** performs application-defined processing by implementing event hook method. Application layer classes are desencants of event handler class.
   
+### Structure
+The related souce files.
 
+```bash
+├── applications
+│   └── example_reactor
+│       ├── Acceptor.cpp
+│       ├── Acceptor.hpp
+│       ├── MainClient.cpp
+│       ├── MainServer.cpp
+│       ├── ServerEventHandler.cpp
+│       └── ServerEventHandler.hpp
+├── framework
+│   ├── v_1_0
+│   │   ├── EventHandler.cpp
+│   │   ├── EventHandler.hpp
+│   │   ├── Reactor.cpp
+│   │   └── Reactor.hpp
+```
 
 ### Event infrastructure layer classes
 
@@ -100,7 +119,7 @@ public:
 
 #### Client application
 - Communicates with server application for demonstration. it sends message user typed to server application and shows responded message from the server application.
-- It is not implemented using framework.
+- It is implemented without using framework, the reactor pattern is not applied.
 
 ### How it works
 - The Acceptor listens for new client connections. When a connection is established, it creates a ServerEventHandler and registers it with the Reactor.
