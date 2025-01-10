@@ -119,7 +119,7 @@ public:
 
 #### Client application
 - Communicates with server application for demonstration. it sends message user typed to server application and shows responded message from the server application.
-- It is implemented without using framework, the reactor pattern is not applied.
+- It is implemented without using framework, the reactor pattern is not applied. 
 
 ### How it works
 - The Acceptor listens for new client connections. When a connection is established, it creates a ServerEventHandler and registers it with the Reactor.
