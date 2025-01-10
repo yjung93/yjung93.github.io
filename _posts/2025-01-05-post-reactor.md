@@ -1,6 +1,6 @@
 ---
 title: "Reactor Pattern"
-excerpt_separator: "<!--more-->"
+classes: wide
 categories:
   - Design Pattern - ACE Framework
 tags:
@@ -31,7 +31,6 @@ The Reactor Pattern is a design pattern for handling servcie requests delivered 
 - **Efficiency**: Handles multiple events using a single thread, reducing overhead.
 - **Scalability**: Suitable for systems with many simultaneous connections.
 - **Maintainability**: Promotes modular and decoupled code design.
-
 
 ## Simplifed Reactor Framework implementation
 A simplified Reactor framework has been implemented to help understand the ractor pattern and to understand how to apply it in the framework. The source code of implementation is available on my [Git Repoisitory](https://github.com/yjung93/study_reactor_1_0)  This implementation retains the core architectural principles of ACE framework but removes unnecessary complexity for learning purposes.  
