@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>153</x>
+      <y>81</y>
+      <w>162</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Event Handler</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>108</x>
+      <y>162</y>
+      <w>630</w>
+      <h>396</h>
+    </coordinates>
+    <panel_attributes>template=SVC_HANDLER, PEER_CONNECTOR
+Connector
+--
+
+# mFlags : int
+
+--
+
++ open( reactor : Reactor_1_0::Reactor *reactor = Reactor_1_0::Reactor::getInstance(),
+              flags : int = 0 ) : int
++ close( sh : SVC_HANDLER *&amp; ) : bool
++ connect( svcHandler : SVC_HANDLER *&amp;,
+                  remoteAddr : PEER_CONNECTOR::PEER_ADDR &amp;,
+                  flags : int = 0 ) : int
++ initializeSvcHandler( handle: int , 
+                                     svc_handler : SVC_HANDLER * ) : void
+
+# makeSvcHandler( svcHandler : SVC_HANDLER *&amp; ) : int
+# connectSvcHandler( svcHandler : SVC_HANDLER *,
+                                     remoteAddr : PEER_CONNECTOR::PEER_ADDR, 
+                                    flags: int = 0 ) : int
+# activateSvcHandler( svcHandler : SVC_HANDLER * ) : int
+
+# nonblockingConnect( sh : SVC_HANDLER* ) int
+
+# handleInput( fd : int = INVALID_HANDLE ) : int
+# handleClose( handle : int = INVALID_HANDLE ) : int
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>216</x>
+      <y>99</y>
+      <w>27</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>342</x>
+      <y>81</y>
+      <w>144</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>PEER_CONNECTOR</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>405</x>
+      <y>99</y>
+      <w>27</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

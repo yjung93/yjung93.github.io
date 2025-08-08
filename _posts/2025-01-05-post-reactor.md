@@ -58,11 +58,12 @@ The related souce files.
 │       ├── ServerEventHandler.cpp
 │       └── ServerEventHandler.hpp
 ├── framework
-│   ├── v_1_0
-│   │   ├── EventHandler.cpp
-│   │   ├── EventHandler.hpp
-│   │   ├── Reactor.cpp
-│   │   └── Reactor.hpp
+│   └── reactor
+│       └── 1_0
+│           ├── EventHandler.cpp
+│           ├── EventHandler.hpp
+│           ├── Reactor.cpp
+│           └── Reactor.hpp
 ```
 
 ### Event infrastructure layer classes
@@ -87,8 +88,13 @@ private:
 ```cpp
 class EventHandler {
 public:
-    virtual int handleInput(int fd);
-    virtual ~EventHandler();
+...
+    virtual int handleInput( int fd = INVALID_HANDLE );
+    virtual int handleOutput( int fd = INVALID_HANDLE );
+    virtual int handleException( int fd = INVALID_HANDLE );
+    virtual int handleClose( int handle );
+    virtual int handleSignal( int signun );
+...
 };
 ```
 ### Application layer classes

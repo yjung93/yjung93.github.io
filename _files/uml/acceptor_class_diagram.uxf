@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>144</x>
+      <y>117</y>
+      <w>162</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Event Handler</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>99</x>
+      <y>198</y>
+      <w>594</w>
+      <h>243</h>
+    </coordinates>
+    <panel_attributes>template=SVC_HANDLE, PEER_ACCEPTOR
+Acceptor
+--
+
++ open( localAddr : typename PEER_ACCEPTOR::PEER_ADDR &amp; 
+              reactor : Reactor_1_0::Reactor * = Reactor_1_0::Reactor::getInstance(),
+              flags : int = 0 ) : int
++ close() : int
++ acceptor() : PEER_ACCEPTOR&amp;
+
+# makeSvcHandler( svcHandler : SVC_HANDLER *&amp; ) : int
+# acceptSvcHandler( svcHandler : SVC_HANDLER * ) : int
+# activateSvcHandler( svcHandler : SVC_HANDLER * ) : int
+
+# handleInput( int fd = INVALID_HANDLE ) : int
+# handleClose( int handle = INVALID_HANDLE ) : int
+
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>207</x>
+      <y>135</y>
+      <w>27</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>333</x>
+      <y>117</y>
+      <w>144</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>PEER_ACCEPTOR</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>396</x>
+      <y>135</y>
+      <w>27</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
