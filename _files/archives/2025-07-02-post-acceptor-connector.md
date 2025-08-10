@@ -72,7 +72,7 @@ It consists of the following classes.
 
 ![alt text](/assets/images/acceptor_class_diagram.png)
 
-Dynamic
+Dynamics
 
 ![alt text](/assets/images/acceptor_connection_acceptance_equence.png)
 
@@ -84,7 +84,7 @@ Dynamic
 
 ![alt text](/assets/images/connector_class_diagram.png)
 
-Dynamic
+Dynamics
 
 Synchronous connection.
 ![alt text](/assets/images/connector_synchronous_Sequence.png)
