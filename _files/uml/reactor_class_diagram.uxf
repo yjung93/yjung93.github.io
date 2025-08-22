@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>99</x>
+      <y>45</y>
+      <w>369</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>Reactor
+--
++ runReactorEventLoop( ) : int
++ registerHandler( handler: EventHandler* , 
+                              mask: ReactorMask  ) : int
++ removeHandler( svcHandler : SVC_HANDLER * ) : int
+
+# handleEvents( ) : int
+
+
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

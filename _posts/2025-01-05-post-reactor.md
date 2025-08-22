@@ -9,128 +9,87 @@ tags:
 
 **Table of Contents**
 - [Overview](#overview)
-- [Reacter Pattern](#reacter-pattern)
-- [Simplifed Reactor Framework implementation](#simplifed-reactor-framework-implementation)
+- [Simplified Reactor framework implementation](#simplified-reactor-framework-implementation)
   - [Structure](#structure)
-  - [Event infrastructure layer classes](#event-infrastructure-layer-classes)
+  - [Core classes](#core-classes)
     - [Reactor](#reactor)
-    - [Event Handler](#event-handler)
-  - [Application layer classes](#application-layer-classes)
-    - [Server application](#server-application)
-      - [Acceptor](#acceptor)
-      - [ServerEventHandler](#servereventhandler)
-    - [Client application](#client-application)
-  - [How it works](#how-it-works)
-
+    - [EventHandler](#eventhandler)
+  - [Interaction sequence](#interaction-sequence)
+  - [Example: echo server and client](#example-echo-server-and-client)
+  - [Directory and file structure](#directory-and-file-structure)
 
 ## Overview
-This page introduces the "Reactor Pattern", a powerfull design pattern widely used in high-performance networking application. We will explore this pattern through a simplifed implementation inspired by [the Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html) project.
+The **Reactor pattern** uses a single event loop to demultiplex I/O events and dispatch them to registered handlers. This post is exploring the pattern through a **simplified** implementation inspired by [the Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity. My goal here is to share what I’ve been studying and building.
 
-## Reacter Pattern
-The Reactor Pattern is a design pattern for handling servcie requests delivered concurrently to an application by one or more clients. It efficiently dimultiplexes and dispatches events to appropreate handler. It provides the following benifits.
+## Simplified Reactor framework implementation
+I built a small, learning-oriented framework that retains the core ideas from ACE (initiation dispatcher, event demultiplexing, handler registration) while keeping the code minimal. The source is in my [Git repository](https://github.com/yjung93/study_reactor_1_0).
 
-- **Efficiency**: Handles multiple events using a single thread, reducing overhead.
-- **Scalability**: Suitable for systems with many simultaneous connections.
-- **Maintainability**: Promotes modular and decoupled code design.
-
-## Simplifed Reactor Framework implementation
-A simplified Reactor framework has been implemented to help understand the ractor pattern and to understand how to apply it in the framework. The source code of implementation is available on my [Git Repoisitory](https://github.com/yjung93/study_reactor_1_0)  This implementation retains the core architectural principles of ACE framework but removes unnecessary complexity for learning purposes.  
-
-The relationship between classes in the Simplifed Reactor Framework is shown in the following diagram.
-
-![alt text](/assets/images/reactor_class_diagram_v_1_1.jpg)
-
-These classes play the following role in accordance with the Reactor Pattern.
-- **Event infrastructure layer classes**  detects and demultiplexes events to eventhandler and then dispatches corresponding eventhook method of event handler implemented in applcation. it provides an application-independent approach for handling the event.
-
-- **Application layer classes** performs application-defined processing by implementing event hook method. Application layer classes are desencants of event handler class.
-  
 ### Structure
-The related souce files.
+At a high level:
 
-```bash
-├── applications
-│   └── example_reactor
-│       ├── Acceptor.cpp
-│       ├── Acceptor.hpp
-│       ├── MainClient.cpp
-│       ├── MainServer.cpp
-│       ├── ServerEventHandler.cpp
-│       └── ServerEventHandler.hpp
-├── framework
-│   └── reactor
-│       └── 1_0
-│           ├── EventHandler.cpp
-│           ├── EventHandler.hpp
-│           ├── Reactor.cpp
-│           └── Reactor.hpp
-```
++ **Reactor** – runs the event loop, waits for events, dispatches to handlers.
++ **EventHandler** – base class; concrete handlers implement the I/O logic.
+ 
+![UML — Reactor, EventHandler, Acceptor/ServerHandler relationships](/assets/images/reactor_class_diagram_v_1_1.jpg)
 
-### Event infrastructure layer classes
+### Core classes
 
 #### Reactor
-- Manages and dispatches events to appropriate handlers
-- Implements the select() system call to monitor multiple sockets for activity
+- Maintains a registry of active handlers.
+- Uses a synchronous demultiplexer (e.g., `select`) to wait for activity.
+- Dispatches `handleInput(fd)` on the ready handlers.
+- Provides `registerHandler()` and `removeHandler()` to manage the registry and lifetime.
 
-```cpp
-class Reactor {
-public:
-    int runReactorEventLoop();
-    int registerHandler(EventHandler* handler, ReactorMask mask);
-    int removeHandler(EventHandler* handler);
-private:
-    int handleEvents();
-};
-```
-#### Event Handler
-- Perform actions in response to events
+![alt text](/assets/images/reactor_class_diagram.png)
 
-```cpp
-class EventHandler {
-public:
-...
-    virtual int handleInput( int fd = INVALID_HANDLE );
-    virtual int handleOutput( int fd = INVALID_HANDLE );
-    virtual int handleException( int fd = INVALID_HANDLE );
-    virtual int handleClose( int handle );
-    virtual int handleSignal( int signun );
-...
-};
-```
-### Application layer classes
+#### EventHandler
+- Base interface for application-specific handlers.
+- Stores the OS handle/FD and a back-reference to the `Reactor`.
+- Overridable `handleInput(fd)` method contains the actual I/O logic for each handler.
 
-#### Server application
+![alt text](/assets/images/eventhandler_class_diagram.png)
+
+### Interaction sequence
+1. Handlers register themselves (or are registered by an acceptor) with the `Reactor`.
+2. The `Reactor` blocks in `select()` and wakes when one or more FDs are ready.
+3. For each ready FD, the corresponding handler’s `handleInput(fd)` is invoked.
+4. Handlers may read/write, create new handlers (e.g., for new connections), or deregister on close.
+
+![alt text](/assets/images/reactor_Sequence.png)
+
+### Example: echo server and client
+For a quick demo, I built a tiny echo server using:
+- An **Acceptor**-like handler for passive opens (creates a per-connection handler).
+- A **Server handler** that reads data and echoes it back.
+- A simple **client** that connects, sends user input, and prints the response.
 
 ![alt text](/assets/images/example_reactor.png)
 
-##### Acceptor
-- Responsible for accepting incoming client connections and creating corresponding ServerEventHandler instances.
-
-```cpp
-class Acceptor : public EventHandler {
-public:
-    void open();
-    int handleInput(int fd);
-};
-```
-##### ServerEventHandler
-- Handles communication with individual clients. It echoes back received messages to demonstrate the functionality
- 
-```cpp
-class ServerEventHandler : public EventHandler {
-public:
-    int handleInput(int fd);
-};
-```
-
-#### Client application
-- Communicates with server application for demonstration. it sends message user typed to server application and shows responded message from the server application.
-- It is implemented without using framework, the reactor pattern is not applied. 
-
-### How it works
+#### How it works
 - The Acceptor listens for new client connections. When a connection is established, it creates a ServerEventHandler and registers it with the Reactor.
 - The Reactor monitors all registered event handlers using the select() system call and delegates events to their respective handlers.
 - The ServerEventHandler processes client messages and echoes them back​
 
 ![alt text](/assets/images/example_reactor_Sequence.png)
 
+
+This shows how the Reactor’s single event loop can manage multiple connections cleanly, while each handler stays focused on its own responsibility.
+
+### Directory and file structure
+Related source files for the Reactor demo:
+
+```bash
+├── applications
+│   ├── example_reactor
+│   │   ├── MainClient.cpp
+│   │   ├── MainServer.cpp
+│   │   ├── ServerEventHandler.cpp
+│   │   ├── ServerEventHandler.hpp
+│   │   └── Acceptor.cpp / Acceptor.hpp     # minimal acceptor used by the server
+├── framework
+│   └── v_1_0
+│       ├── Reactor.cpp
+│       ├── Reactor.hpp
+│       ├── EventHandler.cpp
+│       └── EventHandler.hpp
+```
