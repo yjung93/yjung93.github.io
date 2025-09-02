@@ -1,0 +1,36 @@
+<!-- Mermaid support for Minimal Mistakes: converts ```mermaid fences -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+(function () {
+  function convertMermaidFences() {
+    document.querySelectorAll('pre > code.language-mermaid').forEach(code => {
+      const pre = code.parentElement;
+      const container = document.createElement('div');
+      container.className = 'mermaid';
+      // textContent decodes entities like &lt;br/&gt; to <br/>, which Mermaid supports with securityLevel 'loose'
+      container.innerHTML = code.textContent;
+      pre.replaceWith(container);
+    });
+  }
+
+  function initMermaid() {
+    // Minimal Mistakes sets dark mode via .dark on <body>
+    const isDark = document.body.classList.contains('dark');
+    mermaid.initialize({
+      startOnLoad: false,       // we'll call run() manually after converting
+      securityLevel: 'loose',   // allows <br/> in notes
+      theme: isDark ? 'dark' : 'default'
+    });
+    // Render all .mermaid blocks
+    mermaid.run({ querySelector: '.mermaid' });
+  }
+
+  function go() { convertMermaidFences(); initMermaid(); }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', go);
+  } else {
+    go();
+  }
+})();
+</script>
