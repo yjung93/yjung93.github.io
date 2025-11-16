@@ -9,8 +9,11 @@ tags:
 
 **Table of Contents**
 - [Overview](#overview)
+- [Half-Sync/Half-Async pattern](#half-synchalf-async-pattern)
+  - [Background](#background)
+  - [Solution](#solution)
   - [Structure](#structure)
-- [Simplified Task framework implementation](#simplified-task-framework-implementation)
+- [Simplified implementation](#simplified-implementation)
   - [class diagram](#class-diagram)
   - [sequence diagram](#sequence-diagram)
 - [Example Application using Task framework](#example-application-using-task-framework)
@@ -26,21 +29,34 @@ tags:
 
 
 ## Overview
-The **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] simplifies programming in concurrent systems by decoupling asynchronous and synchronous service processing.
 
-
-
-This post explores this pattern through a **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The design pattern is applied to the **Task Framework** [[SH03](/references/post-references)] of ACE.
+This post explores the **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] through a **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). 
 
 My goal is to share what I learned by building a simplified implementation.
 
+## Half-Sync/Half-Async pattern
+
+The **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] simplifies programming in concurrent systems by decoupling asynchronous and synchronous service processing without reducing performance.
+
+### Background
+Concurrent software systems are often designed with a mixture of synchronous and asynchronous processing services.
+- An asynchronous-processing-based design is efficient for handling time-critical events such as hardware interrupts or software signal events. 
+- A synchronous-processing-based design, in contrast, simplifies the programming effort.
+
+To achieve both programming simplicity and high performance, we need to combine these two approaches in the software architecture.
+
+### Solution
+Decompose the system into two layers, a synchronous service layer and an asynchronous service layer, each running in a different thread. Add a message-queue layer between them so that the two layers communicate via the queue.
+
+- The asynchronous service layer acts as a time-critical, low-level layer. It wakes up on events such as hardware interrupts or software signals from the underlying system and forwards the corresponding messages to the synchronous service layer via the message queue.
+- The synchronous service layer implements higher-level, long-duration application services such as database queries or file reading/writing on a separate, independent thread.   
 
 ### Structure
 This pattern is organized into three layers:
 
-+ **Asynchronous (or reactive) processing Layer**
-+ **Synchronous service processing Layer**
-+ **Message Queue between Async. and Sync. layer**
++ **Asynchronous (or reactive) service layer**
++ **Synchronous service layer**
++ **Message-queue layer between async and sync layers**
 
 
 ```mermaid
@@ -74,20 +90,23 @@ flowchart BT
   %% External event source -> Async service
   EES -->|Interrupt| AS
 ```
-## Simplified Task framework implementation
+## Simplified implementation
+
+The design pattern is applied to the **Task Framework** [[SH03](/references/post-references)] of ACE.
+
 The simplified **Task framework** is implemented to better understand how the pattern works and how it fits into a layered design. The source is in my [Git repository](https://github.com/yjung93/study_reactor_1_0).  
 
 This version keeps the core architectural ideas from ACE while intentionally skipping production-level complexity.
 
 The framework consists of the following components:
 - **Task class**
-  - Base class of synchronous services. It embeds a message queue and a worker thread, enabling the concrete class to perform synchronous layer services.  
+  - Base class of synchronous services. It embeds a message queue and a worker thread, enabling the concrete class to perform services in the synchronous service layer.  
 - **Message Queue**
-  - The asynchronous layer passes messages through this queue to the synchronous layer service.   
+  - The asynchronous service layer passes messages through this queue to the synchronous service layer.   
 - **Worker Thread**
-  - The thread on which the synchronous service runs. It wakes up when it receives a message from the asynchronous service and performs the synchronous application service.
+  - The thread on which the synchronous service runs. It wakes up when it receives a message from the asynchronous service layer and performs the synchronous application service.
 - **Sync service**
-  - Concrete subclass of `Task`. It receives messages from the asynchronous layer and performs synchronous application services.
+  - Concrete subclass of `Task`. It receives messages from the asynchronous service layer and performs synchronous application services.
 
 ### class diagram
 
