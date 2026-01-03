@@ -16,7 +16,7 @@ tags:
 - [Simplified implementation](#simplified-implementation)
   - [class diagram](#class-diagram)
   - [sequence diagram](#sequence-diagram)
-- [Example Application using Task framework](#example-application-using-task-framework)
+- [Example Application using simplified Task framework](#example-application-using-simplified-task-framework)
   - [Server application](#server-application)
     - [Accepror](#accepror)
     - [AsyncService](#asyncservice)
@@ -172,7 +172,7 @@ sequenceDiagram
     deactivate AS
 ```
 
-## Example Application using Task framework
+## Example Application using simplified Task framework
 
 ### Server application
 - Demonstration server that waits for client connections, accepts them, and echoes messages received from clients.
