@@ -33,8 +33,11 @@ This post introduces the **Acceptor-Connector pattern** [[POSA2](/references/pos
 My goal here is to share what I've learned through a simplified implementation.
 
 ## Simplified Acceptor-Connector framework implementation
-I built a small, learning-oriented Acceptor-Connector framework to understand how the pattern works and how it fits into a layered design. The source is in my [Git repository](https://github.com/yjung93/study_reactor_1_0).  
+I built a small, learning-oriented Acceptor-Connector framework to understand how the pattern works and how it fits into a layered design. 
+
 This version keeps the core architectural ideas from ACE while intentionally skipping production-level complexity.
+
+The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).  
 
 ### Structure
 The implementation is organized into three layers:

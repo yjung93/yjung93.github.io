@@ -94,7 +94,9 @@ flowchart LR
 
 ## Simplified version of Implementation
 
-This simplified **Active Object pattern** implementation and example application were created to better understand how the pattern works and how it is designed. The source is in my [Git repository](https://github.com/yjung93/study_reactor_1_0).  
+This simplified **Active Object pattern** implementation and example application were created to better understand how the pattern works and how it is designed. 
+
+The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).
 
 ### Design Choices
 This version keeps the core architectural ideas from ACE while intentionally skipping production-level complexity. For example, unlike the full ACE implementation which applies priority when executing methods in the active list, this version uses a simple FIFO strategy for executing methods.

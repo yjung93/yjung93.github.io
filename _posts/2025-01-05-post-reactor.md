@@ -16,13 +16,16 @@ tags:
     - [EventHandler](#eventhandler)
   - [Interaction sequence](#interaction-sequence)
   - [Example: echo server and client](#example-echo-server-and-client)
+    - [How it works](#how-it-works)
   - [Directory and file structure](#directory-and-file-structure)
 
 ## Overview
 The **Reactor pattern** uses a single event loop to demultiplex I/O events and dispatch them to registered handlers. This post is exploring the pattern through a **simplified** implementation inspired by [the Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity. My goal here is to share what I’ve been studying and building.
 
 ## Simplified Reactor framework implementation
-I built a small, learning-oriented framework that retains the core ideas from ACE (initiation dispatcher, event demultiplexing, handler registration) while keeping the code minimal. The source is in my [Git repository](https://github.com/yjung93/study_reactor_1_0).
+I built a small, learning-oriented framework that retains the core ideas from ACE (initiation dispatcher, event demultiplexing, handler registration) while keeping the code minimal. 
+
+The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).
 
 ### Structure
 At a high level:

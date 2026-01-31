@@ -171,6 +171,7 @@ This version keeps the core architectural ideas from ACE while intentionally ski
 The following frameworks are used as infrastructure for this implementation:
 - [Reactor framework](/design%20pattern%20-%20ace%20framework/post-reactor/)
 
+The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).
 
 ### Component Mapping
 To implement this pattern, I mapped the Proactor pattern components to the following C++ classes and associated OS kernel services:
@@ -200,7 +201,7 @@ The Core components of the Proactor framework are:
 -   
 ### Application Layer
 
-The example application demonstrates a hybrid approach where:
+The example application demonstrates a hybrid approach ( Reactor along with Proactor) where:
 -   **Acceptor**: Uses the **Reactor** pattern to synchronously listen for and accept new TCP connections. Upon acceptance, it creates a `ServerEventHandler` and hands over the new socket to the Proactor framework.
 -   **ServerEventHandler**: A concrete `ServiceHandler` that manages the lifecycle of a client connection. It initiates asynchronous reads and writes using `AsynchReadStream` and `AsynchWriteStream`.
   
