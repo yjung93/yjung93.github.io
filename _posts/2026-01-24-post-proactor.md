@@ -181,11 +181,11 @@ To implement this pattern, I mapped the Proactor pattern components to the follo
 | **Asynchronous Operations** | `POSIX.4 Asynchronous I/O` |
 | **Completion Handler** | `Handler/ServiceHandler` |
 | **Concrete Completion Handlers** | `ServerEventHandler` |
-| **Asynchronous Operation Processor** | `AsynchReadStream/ AsynchWriteStream` |
+| **Asynchronous Operation Processor** | `POSIX.4 Asynchronous I/O` |
 | **Completion Event Queue** | `POSIX.4 Asynchronous I/O` |
 | **Asynchronous Event Demultiplexer** | `POSIX.4 Asynchronous I/O` |
 | **Proactor** | `Proactor` |
-| **Initiator** | `ServerEventHandler` |
+| **Initiator** | `AsynchReadStream/AsynchWriteStream` |
 
 
 ### Framework Layer
