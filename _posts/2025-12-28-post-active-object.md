@@ -29,7 +29,7 @@ tags:
 
 This post covers the following topics:
 - The **Active Object pattern** [[POSA2](/references/post-references)] for untangling method execution from method invocation to maintain high concurrency.
-- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 ## Active Object pattern
 
@@ -96,7 +96,7 @@ flowchart LR
 
 This simplified **Active Object pattern** implementation and example application were created to better understand how the pattern works and how it is designed. 
 
-The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).
+The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 ### Design Choices
 This version keeps the core architectural ideas from ACE while intentionally skipping production-level complexity. For example, unlike the full ACE implementation which applies priority when executing methods in the active list, this version uses a simple FIFO strategy for executing methods.

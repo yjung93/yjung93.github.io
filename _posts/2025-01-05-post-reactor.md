@@ -22,12 +22,12 @@ tags:
 ## Overview
 This post covers the following topics:
 - The **Reactor pattern** using a single event loop to demultiplex I/O events and dispatch them to registered handlers.
-- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity. The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 ## Simplified Reactor framework implementation
 I built a small, learning-oriented framework that retains the core ideas from ACE (initiation dispatcher, event demultiplexing, handler registration) while keeping the code minimal. 
 
-The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).
+The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 ### Structure
 At a high level:

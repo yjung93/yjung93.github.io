@@ -29,7 +29,7 @@ tags:
 
 This post covers the following topics:
 - The **Asynchronous Completion Token pattern** [[POSA2](/references/post-references)] for efficiently managing state in asynchronous operations.
-- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 ## Asynchronous Completion Token (ACT) pattern
 
@@ -123,7 +123,7 @@ The participants of ACT in this post are implemented as part of a simplified **P
 The following framework is used as infrastructure for this implementation:
 - [Reactor framework](/design%20pattern%20-%20ace%20framework/post-reactor/)
 
-The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).  
+The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 ### Component Mapping
 To implement this pattern, I mapped the ACT pattern components to the following C++ classes and associated OS kernel services:

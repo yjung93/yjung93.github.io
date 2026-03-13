@@ -32,7 +32,7 @@ tags:
 
 This post covers the following topics:
 - The **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] for decoupling asynchronous operations from synchronous processing.
-- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 ## Half-Sync/Half-Async pattern
 
@@ -98,7 +98,7 @@ The simplified **Task framework** is implemented to better understand how the pa
 
 This version keeps the core architectural ideas from ACE while intentionally skipping production-level complexity.
 
-The source code is available at my [GitHub repository](https://github.com/yjung93/study_ACE_design_pattern).  
+The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern). 
 
 The framework consists of the following components:
 - **Task class**
