@@ -40,7 +40,8 @@
   /* Remove the empty left sidebar space on single pages where we disabled author_profile */
   @media (min-width: 64em) {
     /* The main content area in Minimal Mistakes is .page */
-    .layout--single .page {
+    .layout--single .page,
+    .layout--home .page {
       float: none !important;
       margin-left: auto !important;
       margin-right: auto !important;
@@ -48,7 +49,8 @@
       max-width: 1000px !important;
       padding-right: 0 !important;
     }
-    .layout--single .sidebar {
+    .layout--single .sidebar,
+    .layout--home .sidebar {
       display: none !important;
     }
   }
