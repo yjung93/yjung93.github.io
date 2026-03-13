@@ -29,8 +29,9 @@ tags:
 
 
 ## Overview
-This post introduces the **Acceptor-Connector pattern** [[POSA2](/references/post-references)], which **decouples connection establishment and initialization** from the components that perform application logic after a connection is established. I’m exploring this pattern through a **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).  
-My goal here is to share what I've learned through a simplified implementation.
+This post covers the following topics:
+- The **Acceptor-Connector pattern** [[POSA2](/references/post-references)] for decoupling connection establishment and initialization from application logic.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
 
 ## Simplified Acceptor-Connector framework implementation
 I built a small, learning-oriented Acceptor-Connector framework to understand how the pattern works and how it fits into a layered design. 

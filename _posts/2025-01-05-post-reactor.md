@@ -20,7 +20,9 @@ tags:
   - [Directory and file structure](#directory-and-file-structure)
 
 ## Overview
-The **Reactor pattern** uses a single event loop to demultiplex I/O events and dispatch them to registered handlers. This post is exploring the pattern through a **simplified** implementation inspired by [the Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity. My goal here is to share what I’ve been studying and building.
+This post covers the following topics:
+- The **Reactor pattern** using a single event loop to demultiplex I/O events and dispatch them to registered handlers.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity.
 
 ## Simplified Reactor framework implementation
 I built a small, learning-oriented framework that retains the core ideas from ACE (initiation dispatcher, event demultiplexing, handler registration) while keeping the code minimal. 

@@ -27,9 +27,9 @@ tags:
 
 ## Overview
 
-This post explores the **Asynchronous Completion Token** [[POSA2](/references/post-references)] through a **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). 
-
-The goal of this post is to share what I learned while building the simplified implementation.
+This post covers the following topics:
+- The **Asynchronous Completion Token pattern** [[POSA2](/references/post-references)] for efficiently managing state in asynchronous operations.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
 
 ## Asynchronous Completion Token (ACT) pattern
 

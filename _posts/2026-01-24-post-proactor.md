@@ -27,9 +27,9 @@ tags:
 
 ## Overview
 
-This post explores the **Proactor pattern** [[POSA2](/references/post-references)] through a **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). 
-
-My goal is to share what I learned by building this simplified implementation.
+This post covers the following topics:
+- The **Proactor pattern** [[POSA2](/references/post-references)] for demultiplexing and dispatching events triggered by asynchronous I/O completion.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
 
 ## Proactor pattern
 

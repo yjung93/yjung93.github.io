@@ -27,9 +27,9 @@ tags:
 
 ## Overview
 
-This post explores the **Active Object pattern** [[POSA2](/references/post-references)] through a **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). 
-
-My goal is to share what I learned by building this simplified implementation.
+This post covers the following topics:
+- The **Active Object pattern** [[POSA2](/references/post-references)] for untangling method execution from method invocation to maintain high concurrency.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
 
 ## Active Object pattern
 

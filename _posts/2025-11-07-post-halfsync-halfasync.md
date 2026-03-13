@@ -30,9 +30,9 @@ tags:
 
 ## Overview
 
-This post explores the **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] through a **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). 
-
-My goal is to share what I learned by building a simplified implementation.
+This post covers the following topics:
+- The **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] for decoupling asynchronous operations from synchronous processing.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html).
 
 ## Half-Sync/Half-Async pattern
 
