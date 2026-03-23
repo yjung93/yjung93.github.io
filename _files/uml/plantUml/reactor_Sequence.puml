@@ -1,0 +1,27 @@
+@startuml
+skinparam style strictuml
+skinparam maxMessageSize 150
+skinparam ParticipantPadding 80
+
+participant "handler" as handler
+participant "Reactor" as Reactor
+
+handler -> Reactor : registerHandler()
+activate Reactor
+deactivate Reactor
+
+Reactor <-] : runReactorEventLoop()
+activate Reactor
+
+Reactor -> Reactor : select()
+activate Reactor
+
+Reactor <-] : event
+deactivate Reactor
+
+Reactor -> handler : handleInput()
+activate handler
+deactivate handler
+
+deactivate Reactor
+@enduml

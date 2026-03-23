@@ -1,0 +1,22 @@
+@startuml
+skinparam style strictuml
+skinparam nodesep 80
+skinparam ranksep 60
+
+class "Reactor" as Reactor {
+}
+
+class "Event Handler" as EventHandler {
+}
+
+class "Application Event Handler" as AppEventHandler {
+}
+
+' Application Event Handler inherits from Event Handler
+EventHandler <|-- AppEventHandler
+
+' Relationships between Reactor and Event Handler
+Reactor .> EventHandler : dispatches to >
+EventHandler "0..n" --> "1" Reactor : registers with >
+
+@enduml

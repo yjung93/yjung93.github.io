@@ -1,0 +1,45 @@
+@startuml
+skinparam style strictuml
+hide circle
+skinparam nodesep 100
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+
+class Reactor {
+  handle_events()
+  register_handler()
+  remove_handler()
+}
+
+abstract class "Event Handler" as EventHandler {
+  handle_event()
+  get_handle()
+}
+
+class Handle
+
+class "Synchronous Event\nDemultiplexer" as Demultiplexer {
+  select()
+}
+
+class "Concrete Event\nHandler A" as ConcreteEventHandlerA {
+  handle_event()
+  get_handle()
+}
+
+class "Concrete Event\nHandler B" as ConcreteEventHandlerB {
+  handle_event()
+  get_handle()
+}
+
+' Relationships
+Reactor -right- "*" EventHandler : dispatches
+Reactor -right- "*" Handle : handle set
+EventHandler -left- Handle : owns
+Handle "*" -- Demultiplexer : notifies
+Reactor ..> Demultiplexer : <<use>>
+
+EventHandler <|-- ConcreteEventHandlerA
+EventHandler <|-- ConcreteEventHandlerB
+
+@enduml

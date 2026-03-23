@@ -1,0 +1,41 @@
+@startuml
+skinparam style strictuml
+skinparam maxMessageSize 150
+skinparam ParticipantPadding 40
+
+participant Client
+participant Acceptor
+participant ServerEventHandler
+participant Reactor
+
+Acceptor -> Reactor : registerHandler()
+
+Client -> Reactor : connect
+
+Reactor -> Acceptor : handleInput()
+activate Acceptor
+
+create ServerEventHandler
+Acceptor -> ServerEventHandler : create
+activate ServerEventHandler
+
+ServerEventHandler -> Reactor : registerHandler()
+deactivate Acceptor
+
+[-> Client : message
+Client -> Reactor : message
+
+Reactor -> ServerEventHandler : handleInput()
+activate ServerEventHandler
+
+ServerEventHandler -> Client : Echo message
+deactivate ServerEventHandler
+
+[-> Client : destroy
+Client -> Reactor : disconnect
+
+Reactor -> ServerEventHandler : destroy
+destroy ServerEventHandler
+destroy Client
+
+@enduml

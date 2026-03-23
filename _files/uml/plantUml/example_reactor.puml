@@ -1,0 +1,31 @@
+@startuml
+skinparam style strictuml
+skinparam nodesep 60
+skinparam ranksep 60
+skinparam sameClassWidth true
+skinparam minClassWidth 180
+
+class EventHandler {
+}
+
+class ServerEventHandler {
+}
+
+class Acceptor {
+}
+
+class Reactor {
+}
+
+' Force vertical layout for inheritance (EventHandler at the top)
+EventHandler <|-- ServerEventHandler
+EventHandler <|-- Acceptor
+
+' Force horizontal layout for the create relationship (Acceptor on right, ServerEventHandler on left)
+ServerEventHandler <.right. Acceptor : <<create>>
+
+' Force Reactor to be at the bottom with diamonds on the Reactor
+Reactor o-up- ServerEventHandler
+Reactor o-up- Acceptor
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+hide footbox
+skinparam style strictuml
+skinparam maxMessageSize 1000
+skinparam ParticipantPadding 40
+
+
+participant ": Main Program\n" as Main
+participant ": Concrete Event Handler\n" as Handler
+participant ": Reactor\n" as Reactor
+participant ": Synchronous\n Event Demultiplexer" as Demux
+
+activate Main
+
+' Registration phase
+Main -> Reactor : register_handler() \n[Concrete Event Handler, Events]
+activate Reactor
+
+Reactor -> Handler : get_handle()
+activate Handler
+Handler -->> Reactor : **Handle**
+deactivate Handler
+
+Reactor -->> Main 
+deactivate Reactor
+
+' Event handling phase
+Main -> Reactor : handle_events()
+activate Reactor
+
+Reactor -> Demux : select() \n[**Handles**]
+activate Demux
+
+' External event arrives
+Demux <-: //event//
+
+Demux -->> Reactor : **Handles**
+deactivate Demux
+
+Reactor -> Handler : handle_event()
+activate Handler
+
+Handler -> Handler : service()
+activate Handler
+deactivate Handler
+
+deactivate Handler
+deactivate Reactor
+deactivate Main
+
+@enduml
