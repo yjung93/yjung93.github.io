@@ -9,7 +9,7 @@ tags:
 
 **Table of Contents**
 - [Overview](#overview)
-- [Half-Sync/Half-Async pattern](#half-synchalf-async-pattern)
+- [Half-Sync/Half-Async pattern \[POSA2\]](#half-synchalf-async-pattern-posa2)
   - [Background](#background)
   - [Solution](#solution)
   - [Structure](#structure)
@@ -31,12 +31,12 @@ tags:
 ## Overview
 
 This post covers the following topics:
-- The **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] for decoupling asynchronous operations from synchronous processing.
+- The **Half-Sync/Half-Async pattern**  for decoupling asynchronous operations from synchronous processing.
 - A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
-## Half-Sync/Half-Async pattern
+## Half-Sync/Half-Async pattern [[POSA2](/references/post-references)]
 
-The **Half-Sync/Half-Async pattern** [[POSA2](/references/post-references)] simplifies programming in concurrent systems by decoupling asynchronous and synchronous service processing without reducing performance.
+The **Half-Sync/Half-Async pattern** simplifies programming in concurrent systems by decoupling asynchronous and synchronous service processing without reducing performance.
 
 ### Background
 Concurrent software systems are often designed with a mixture of synchronous and asynchronous processing services.
@@ -58,38 +58,10 @@ This pattern is organized into three layers:
 + **Synchronous service layer**
 + **Message-queue layer between async and sync layers**
 
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/halfsync_halfasync_structure.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/halfsync_halfasync_structure.svg" alt="Reactor PlantUML Diagram" width="70%">
 
-```mermaid
 
-flowchart BT
-  %% Layers
-  subgraph Synchronous_Services_Layer[ Synchronous Services Layer ]
-    SS1[Sync Service 1]
-    SS2[Sync Service 2]
-    SS3[Sync Service 3]
-  end
-
-  subgraph Queueing_Layer[ Queueing Layer ]
-    Q[[Queue]]
-  end
-
-  subgraph Asynchronous_Services_Layer[ Asynchronous Service Layer ]
-    AS[Async Service]
-    EES[External Event Source]
-  end
-
-  %% Sync services <-> Queue
-  Q -->|message| SS1
-  Q -->|message| SS2
-  Q -->|message| SS3
-
-  %% Async service <-> Queue
-  
-  AS -->|message| Q
-
-  %% External event source -> Async service
-  EES -->|Interrupt| AS
-```
 ## Simplified implementation
 
 The design pattern is applied to the **Task Framework** [[SH03](/references/post-references)] of ACE.
@@ -111,68 +83,14 @@ The framework consists of the following components:
   - Concrete subclass of `Task`. It receives messages from the asynchronous service layer and performs synchronous application services.
 
 ### class diagram
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/example_halfsync_halfasync_framework_class.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/example_halfsync_halfasync_framework_class.svg" alt="Reactor PlantUML Diagram" width="60%">
 
-```mermaid
----
-config:
-  layout: elk
----
-
-classDiagram 
-    direction BT
-
-    class workerThread
-    class Task
-    class messageQueue
-    class SyncService
-
-    %% Composition (black diamond) from workerThread → Task
-    workerThread *-- Task
-
-    %% Composition (black diamond) from messageQueue → Task
-    messageQueue *-- Task
-
-    %% Inheritance (triangle) SyncService → Task
-    SyncService --|> Task
-
-```
 ### sequence diagram
 
-```mermaid
----
-config:
-  layout: elk
----
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/example_halfsync_halfasync_framework_sequence.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/example_halfsync_halfasync_framework_sequence.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-sequenceDiagram
-    participant EES as : External Event Source
-    participant AS  as : Async Service
-    participant Q   as : MessageQueue
-    participant SS  as : Sync Service
-
-    EES ->> AS: notification
-    activate AS
-
-    AS  ->> EES: read()
-    EES -->> AS: message
-
-    AS  ->> AS: work()
-
-    AS  ->> Q: putQ(message)
-    activate Q
-
-    Q   ->> SS: notification
-    activate SS
-
-    SS  ->> Q: getQ()
-    Q  -->> SS: message
-
-    SS  ->> SS: work()
-
-    deactivate SS
-    deactivate Q
-    deactivate AS
-```
 
 ## Example Application using simplified Task framework
 
@@ -192,108 +110,25 @@ sequenceDiagram
 - Processes synchronous services on a separate, independent thread.
 
 ### class diagram
-```mermaid
 
-classDiagram 
-    direction TB
 
-    class AsyncService
-    class Reactor
-    class EventHandler
-    class Acceptor
 
-    class Task
-    class SyncService
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/example_halfsync_halfasync_application_class.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/example_halfsync_halfasync_application_class.svg" alt="Reactor PlantUML Diagram" width="70%">
 
-    Reactor o-- EventHandler 
-    EventHandler <|--   AsyncService
-    EventHandler <|-- Acceptor
-    Acceptor o-- AsyncService
-      
-    AsyncService *-- SyncService
-    Task <|-- SyncService
-
-```
 
 ### Sequence Diagram
 
 #### Interoperation between Async and Sync service layer
 
-```mermaid
-sequenceDiagram
-    participant CL  as : Client
-    participant RTOR as : Reactor
-    participant AS  as : AsyncService
-    participant Q   as : MessageQueue
-    participant SS  as : Sync Service
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/example_halfsync_halfasync_application_interoperation_async_sync.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/example_halfsync_halfasync_application_interoperation_async_sync.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-    CL ->> RTOR: message
-
-    RTOR ->> AS: handleInput()    
-    activate AS
-
-    AS  ->> RTOR: read()
-    RTOR -->> AS: message
-
-    AS  ->> Q: putQ(message)
-    deactivate AS
-    activate Q
-
-    Q   ->> SS: notification
-    activate SS
-
-    SS  ->> Q: getQ()
-    Q  -->> SS: message
-
-    SS  ->> SS: processService()
-    SS  ->> CL: echo message
-    deactivate SS
-```
 
 #### Life Cycle of Async/Sync Service component
 
-```mermaid
-sequenceDiagram
-    participant CL  as : Client
-    participant RTOR as : Reactor
-    participant ACC  as : Acceptor
-
-    CL ->> RTOR: connect
-
-    RTOR ->> ACC: notification
-    activate ACC
-
-    create  participant AS  as : AsyncService
-    ACC  ->> AS: create()
- 
-    create  participant SS  as : SyncService
-    AS  ->> SS: create()
-    
-    create  participant Q  as : MessageQueue
-    SS  ->> Q: create()
-    %%Q  <<- SS: create()
-
-
-    ACC  ->> RTOR: registHandler( AsyncService )
-    deactivate ACC
-
-    CL ->> RTOR: disconnect
-
-    RTOR ->> ACC: notification
-    activate ACC
-
-    ACC  ->> AS: destroy()
-    AS  ->> SS: destroy()
-    SS  ->> Q: destroy()
-
-    ACC  ->> RTOR: removeHandler( AsyncService )
-    deactivate ACC
-
-    destroy  AS
-    destroy  Q
-    destroy  SS  
-
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/example_halfsync_halfasync_application_lifecycle_async_sync.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/example_halfsync_halfasync_application_lifecycle_async_sync.svg" alt="Reactor PlantUML Diagram" width="100%">
 
 
 ### Directory and file structure

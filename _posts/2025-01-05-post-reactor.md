@@ -9,7 +9,7 @@ tags:
 
 **Table of Contents**
 - [Overview](#overview)
-- [Reactor Pattern](#reactor-pattern)
+- [Reactor Pattern \[POSA2\]](#reactor-pattern-posa2)
   - [Background](#background)
   - [Solution](#solution)
   - [Structure](#structure)
@@ -27,11 +27,11 @@ tags:
 
 ## Overview
 This post covers the following topics:
-- The **Reactor pattern** [[POSA2](/references/post-references)] using a single event loop to demultiplex I/O events and dispatch them to registered handlers.
+- The **Reactor pattern**  using a single event loop to demultiplex I/O events and dispatch them to registered handlers.
 - A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity. The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
 
-## Reactor Pattern
+## Reactor Pattern [[POSA2](/references/post-references)]
 The Reactor pattern is a design pattern for handling service requests delivered concurrently to an application by one or more clients. It efficiently demultiplexes and dispatches events to the appropriate handlers. It provides the following benefits:
 
 - **Efficiency**: Handles multiple events using a single thread, reducing overhead.

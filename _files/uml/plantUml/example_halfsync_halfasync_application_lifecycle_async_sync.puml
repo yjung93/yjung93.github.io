@@ -1,0 +1,43 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 30
+
+participant ": Client" as CL
+participant ": Reactor" as RTOR
+participant ": Acceptor" as ACC
+
+CL -> RTOR: connect
+
+RTOR -> ACC: notification
+activate ACC
+
+create participant ": AsyncService" as AS
+ACC -> AS: create()
+
+create participant ": SyncService" as SS
+AS -> SS: create()
+
+create participant ": MessageQueue" as Q
+SS -> Q: create()
+' Q <-- SS: create()
+
+ACC -> RTOR: registHandler( AsyncService )
+deactivate ACC
+
+CL -> RTOR: disconnect
+
+RTOR -> ACC: notification
+activate ACC
+
+ACC -> AS: destroy()
+AS -> SS: destroy()
+SS -> Q: destroy()
+
+ACC -> RTOR: removeHandler( AsyncService )
+deactivate ACC
+
+destroy AS
+destroy Q
+destroy SS
+@enduml

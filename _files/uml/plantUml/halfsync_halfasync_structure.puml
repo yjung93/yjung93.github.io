@@ -1,0 +1,35 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+skinparam sameClassWidth true
+skinparam minClassWidth 130
+
+
+' Make the package box lines and background invisible
+skinparam packageBorderColor transparent
+skinparam packageBackgroundColor transparent
+
+package "Synchronous Service Layer" {
+  component "Sync Service 1" as ss1
+  component "Sync Service 2" as ss2
+  component "Sync Service 3" as ss3
+}
+
+package "Queueing Layer" {
+  component "Queue" as q
+}
+
+package "Asynchronous Service Layer" {
+  component "Async Service" as async
+  component "External Event Source" as ees
+}
+
+ss1 ...> q : <<read/write>>
+ss2 ...> q : <<read/write>>
+ss3 ...> q : <<read/write>>
+
+async -up..> q : <<dequeue/enqueue>>
+ees -up.> async : <<interrupt>>
+
+@enduml

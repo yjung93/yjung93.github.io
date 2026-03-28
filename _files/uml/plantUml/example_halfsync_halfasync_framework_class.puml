@@ -1,0 +1,20 @@
+@startuml
+
+skinparam style strictuml
+skinparam sameClassWidth true
+skinparam nodesep 100
+
+class workerThread
+class Task
+class messageQueue
+class SyncService
+
+' Composition (black diamond on the left side)
+' -up- forces the Task class to be positioned above the other classes, mimicking direction BT
+workerThread *-up- Task
+messageQueue *-up- Task
+
+' Inheritance (empty triangle on the right side)
+SyncService -left-|> Task
+
+@enduml

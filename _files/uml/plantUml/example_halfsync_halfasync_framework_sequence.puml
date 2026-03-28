@@ -1,0 +1,33 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 30
+
+participant ": External Event Source" as EES
+participant ": Async Service" as AS
+participant ": MessageQueue" as Q
+participant ": Sync Service" as SS
+
+EES -> AS: notification
+activate AS
+
+AS -> EES: read()
+EES --> AS: message
+
+AS -> AS: work()
+
+AS -> Q: putQ(message)
+activate Q
+
+Q -> SS: notification
+activate SS
+
+SS -> Q: getQ()
+Q --> SS: message
+
+SS -> SS: work()
+
+deactivate SS
+deactivate Q
+deactivate AS
+@enduml

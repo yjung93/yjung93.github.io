@@ -1,0 +1,31 @@
+@startuml
+
+skinparam style strictuml
+skinparam sameClassWidth true
+skinparam nodesep 80
+skinparam minClassWidth 130
+
+class AsyncService
+class Reactor
+class EventHandler
+class Acceptor
+class Task
+class SyncService
+
+' Aggregation (empty diamond at Reactor)
+Reactor o-- EventHandler 
+
+' Inheritance (empty triangle pointing to EventHandler)
+EventHandler <|-- AsyncService
+EventHandler <|-- Acceptor
+
+' Aggregation (empty diamond at Acceptor)
+Acceptor o-right- AsyncService
+  
+' Composition (black diamond at AsyncService)
+AsyncService *-right- SyncService
+
+' Inheritance (empty triangle pointing to Task)
+Task <|-down- SyncService
+
+@enduml

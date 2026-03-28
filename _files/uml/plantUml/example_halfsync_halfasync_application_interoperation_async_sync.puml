@@ -1,0 +1,33 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 20
+
+participant ": Client" as CL
+participant ": Reactor" as RTOR
+participant ": AsyncService" as AS
+participant ": MessageQueue" as Q
+participant ": Sync Service" as SS
+
+CL -> RTOR: message
+
+RTOR -> AS: handleInput()    
+activate AS
+
+AS -> RTOR: read()
+RTOR --> AS: message
+
+AS -> Q: putQ(message)
+deactivate AS
+activate Q
+
+Q -> SS: notification
+activate SS
+
+SS -> Q: getQ()
+Q --> SS: message
+
+SS -> SS: processService()
+SS -> CL: echo message
+deactivate SS
+@enduml

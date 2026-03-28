@@ -1,6 +1,5 @@
 @startuml
 skinparam style strictuml
-skinparam maxMessageSize 150
 skinparam ParticipantPadding 40
 
 participant Client
