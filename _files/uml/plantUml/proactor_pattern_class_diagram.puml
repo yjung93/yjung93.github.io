@@ -1,0 +1,54 @@
+@startuml
+
+skinparam style strictuml
+skinparam sameClassWidth true
+' skinparam nodesep 10
+skinparam minClassWidth 130
+
+class Initiator
+
+class AsynchronousOperationProcessor {
+  +execute_async_operation()
+}
+
+class AsynchronousOperation {
+  +async_operation()
+}
+
+class CompletionEventQueue
+
+class AsynchronousEventDemuxer {
+  +get_completion_event()
+}
+
+class Proactor {
+  +handle_events()
+}
+
+class Handle
+
+class CompletionHandler {
+  +handle_event()
+}
+
+class ConcreteCompletionHandler
+
+Initiator -down-> AsynchronousOperationProcessor : << uses >>
+Initiator -down-> AsynchronousOperation : << invokes >>
+Initiator -down-> CompletionHandler : << uses >>
+Initiator -down-> CompletionEventQueue : << uses >>
+
+AsynchronousOperationProcessor .right.> AsynchronousOperation : << concurrency >>
+AsynchronousOperation -right-> Handle : is associated with
+Handle -right-> CompletionHandler : is associated with
+
+AsynchronousOperationProcessor -down-> CompletionEventQueue : << enqueues >>
+AsynchronousEventDemuxer -left-> CompletionEventQueue : << dequeues >>
+
+Proactor -left-> AsynchronousEventDemuxer : << uses  >>
+Proactor -up-> CompletionHandler : << demultiplexes & dispatches  >>
+
+ConcreteCompletionHandler -up-|> CompletionHandler
+
+
+@enduml

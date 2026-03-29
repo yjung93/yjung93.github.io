@@ -1,0 +1,57 @@
+@startuml
+
+skinparam style strictuml
+skinparam sameClassWidth true
+skinparam nodesep 100
+' skinparam minClassWidth 130
+
+class ActivationQueue {
+    +enqueue(MethodRequest*)
+    +dequeue(): MethodRequest*
+}
+
+class Future<T> {
+    +get(): T
+    +set(T)
+    +attach(FutureObserver*)
+}
+
+class FutureRep<T> {
+    +get()
+    +set()
+}
+
+class ActObjScheduler {
+    +enqueue(MethodRequest*)
+    +svc()
+}
+
+class ActObjServant {
+    +RequestGetReturnMessage(string): string
+}
+
+class ActObjServantProxy {
+    +requestGetReturnMessage(string): Future<string>
+}
+
+interface MethodRequest {
+    +call(): int
+}
+
+class RequestGetReturnMessage {
+    +call(): int
+}
+
+' Relationships
+ActObjScheduler -left-> ActivationQueue : owns
+ActObjScheduler ..> MethodRequest : executes
+ActObjServantProxy -up-> ActObjScheduler : uses
+ActObjServantProxy --> ActObjServant : owns
+ActObjServantProxy ..> RequestGetReturnMessage : creates
+RequestGetReturnMessage -up-|> MethodRequest
+RequestGetReturnMessage -right-> ActObjServant : delegates to
+RequestGetReturnMessage -left-> Future : updates
+
+Future *-- FutureRep : shares
+
+@endumld

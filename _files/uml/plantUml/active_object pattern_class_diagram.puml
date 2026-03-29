@@ -1,0 +1,57 @@
+@startuml
+
+skinparam style strictuml
+skinparam sameClassWidth true
+skinparam nodesep 100
+skinparam minClassWidth 130
+class Client
+
+class Proxy {
+  method_1()
+  method_N()
+}
+
+class Scheduler {
+  dispatch()
+  insert()
+}
+
+class "Activation\nQueue" as ActivationQueue {
+  enqueue()
+  dequeue()
+}
+
+class Future
+
+class MethodRequest {
+  can_run()
+  call()
+}
+
+class Servant {
+  method_1()
+  method_N()
+}
+
+class "Concrete\nMethodRequest 1" as ConcreteMethodRequest1
+class "Concrete\nMethodRequest N" as ConcreteMethodRequestN
+
+' Layout hints and relationships
+Client .up.> Proxy : <<invoke>>
+Client .up.> Future : <<obtain result from>>
+
+Proxy "1" -right- "1" Scheduler
+Scheduler "1" -right- "1" ActivationQueue
+
+Proxy .down.> Future : <<instantiate>>
+Proxy .down.> MethodRequest : <<instantiate>>
+
+ActivationQueue --> "*" MethodRequest : <<maintain>>
+
+MethodRequest .left.> Future : <<write to>>
+MethodRequest .right.> Servant : <<execute>>
+
+MethodRequest <|-down- ConcreteMethodRequest1
+MethodRequest <|-down- ConcreteMethodRequestN
+
+@enduml

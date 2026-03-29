@@ -1,0 +1,52 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 20
+
+participant Client
+participant ":ActObjServantProxy" as Proxy
+participant ":ActObjScheduler" as Scheduler
+participant ":ActivationQueue" as Queue
+participant ":RequestGetReturnMessage" as Request
+participant ":ActObjServant" as Servant
+participant ":Future" as Future
+participant ":CallbackGetReturnMessage" as CallBack
+
+note over Client, Proxy: Client Thread
+
+Client -> Proxy: requestGetReturnMessage("Hello")
+activate Proxy
+
+Proxy -> Future: create 
+Proxy -> Request: create
+Proxy -> Scheduler: enqueue(Request)
+Scheduler -> Queue: enqueue(Request)
+
+Proxy --> Client: return Future
+deactivate Proxy
+
+Client -> CallBack : create 
+Client -> Future: attach(CallbackGetReturnMessage)
+
+note over Scheduler, Servant: Scheduler Thread
+
+loop Scheduler Loop
+    Scheduler -> Queue: dequeue()
+    Queue --> Scheduler: Request
+    
+    Scheduler -> Request: call()
+    activate Request
+    
+    Request -> Servant: RequestGetReturnMessage("Hello")
+    Servant --> Request: "Echo - Hello"
+    
+    Request -> Future: set("Echo - Hello")
+    Future --> CallBack: update 
+    deactivate Request
+end
+
+CallBack --> Client: update(future)
+Client -> Future: get()
+Future --> Client: "Echo - Hello"
+
+@enduml

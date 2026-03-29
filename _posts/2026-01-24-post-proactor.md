@@ -9,7 +9,7 @@ tags:
 
 **Table of Contents**
 - [Overview](#overview)
-- [Proactor pattern](#proactor-pattern)
+- [Proactor pattern \[POSA2\]](#proactor-pattern-posa2)
   - [Background](#background)
   - [Solution](#solution)
   - [Structure](#structure)
@@ -28,12 +28,12 @@ tags:
 ## Overview
 
 This post covers the following topics:
-- The **Proactor pattern** [[POSA2](/references/post-references)] for demultiplexing and dispatching events triggered by asynchronous I/O completion.
+- The **Proactor pattern**  for demultiplexing and dispatching events triggered by asynchronous I/O completion.
 - A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
-## Proactor pattern
+## Proactor pattern [[POSA2](/references/post-references)]
 
-The **Proactor pattern** [[POSA2](/references/post-references)] provides an event-driven framework for efficiently handling the initiation of asynchronous operations—which are potentially long-duration—and processing their completion. It offers the performance benefits of concurrency without the complexity downsides often associated with concurrent application design.
+The **Proactor pattern** provides an event-driven framework for efficiently handling the initiation of asynchronous operations—which are potentially long-duration—and processing their completion. It offers the performance benefits of concurrency without the complexity downsides often associated with concurrent application design.
 
 ### Background
 The performance of event-driven applications, particularly server applications in distributed systems, can be improved when requests are processed asynchronously instead of using synchronous I/O APIs that block the thread.
@@ -67,100 +67,13 @@ The Proactor pattern consists of the following participants:
 
 #### Class diagram
 
-```mermaid
-classDiagram
-direction TB
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/proactor_pattern_class_diagram.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/proactor_pattern_class_diagram.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-class Initiator
-
-class AsynchronousOperationProcessor {
-  +execute_async_operation()
-}
-
-class AsynchronousOperation {
-  +async_operation()
-}
-
-class CompletionEventQueue
-
-class AsynchronousEventDemuxer {
-  +get_completion_event()
-}
-
-class Proactor {
-  +handle_events()
-}
-
-class Handle
-
-class CompletionHandler {
-  +handle_event()
-}
-
-class ConcreteCompletionHandler
-
-Initiator --> AsynchronousOperationProcessor : << uses >>
-Initiator --> AsynchronousOperation : << invokes >>
-Initiator --> CompletionHandler : << uses >>
-
-AsynchronousOperationProcessor --> CompletionEventQueue : << enqueues >>
-AsynchronousEventDemuxer --> CompletionEventQueue : << dequeues >>
-
-Proactor --> AsynchronousEventDemuxer : << uses  >>
-Proactor --> CompletionHandler : << demultiplexes & dispatches  >>
-
-AsynchronousOperation --> Handle : is associated with
-Handle --> CompletionHandler : is associated with
-
-ConcreteCompletionHandler --|> CompletionHandler
-
-AsynchronousOperationProcessor ..> AsynchronousOperation : << concurrency >>
-
-```
 #### Dynamic
 
-```mermaid
-sequenceDiagram
-    participant I as Initiator
-    participant AOP as Asynchronous Operation Processor
-    participant AO as Asynchronous Operation
-    participant CEQ as Completion Event Queue
-    participant P as Proactor
-    participant CH as Completion Handler
-
-
-    
-    I->>AOP: execute_async_operation()
-    activate AOP
-
-    AOP->>AO: async_operation()
-    activate AO
-
-    I->>P: handle_events()
-    activate P
-
-    AO->>AO: event
-    AO-->>AOP: Result
-    deactivate AO
-
-    AOP->>CEQ: enqueue(Result)
-    deactivate AOP
-
-
-
-    CEQ-->>P: event
-
-    P->>CH: handle_event(Result)
-    activate CH
-
-    CH->>CH: service()
-    CH-->>P: (done)
-    deactivate CH
-
-    deactivate P
-
-```
-
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/proactor_pattern_dynamic.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/proactor_pattern_dynamic.svg" alt="Reactor PlantUML Diagram" width="100%">
 
 ## Simplified version of Implementation
 
@@ -209,131 +122,21 @@ The example application demonstrates a hybrid approach ( Reactor along with Proa
 
 The following diagram illustrates the relationship between the Proactor framework classes and the application classes.
 
-```mermaid
-classDiagram
-direction LR
-    %% Framework Classes
-    namespace Framework {
-        class Proactor {
-            +getInstance() Proactor
-            +proactorRunEventLoop()
-            +startAio(result, opcode)
-            +handleEvents()
-            -postCompletion(result)
-        }
-
-        class Handler {
-            +handleReadStream(result)
-            +handleWriteStream(result)
-            +proactor()
-        }
-
-        class ServiceHandler {
-            +open(handle)
-            +addresses()
-        }
-
-        class AsynchResult {
-            +complete()
-            +bytes_transferred()
-            +success()
-        }
-
-        class AsynchReadStream {
-            +read(buffer, size, ...)
-            +open(handler, handle)
-        }
-    }
-
-    %% Application Classes
-    namespace Application {
-        class Acceptor {
-            +handleInput(fd)
-            +open()
-        }
-
-        class ServerEventHandler {
-            +open(handle)
-            +handleReadStream(result)
-            +handleWriteStream(result)
-        }
-    }
-
-    %% Relationships
-    Handler <|-- ServiceHandler
-    ServiceHandler <|-- ServerEventHandler
-    
-    Proactor "1" o-- "*" AsynchResult : Manages
-    Handler ..> AsynchResult : Receives
-    
-    ServerEventHandler --> AsynchReadStream : Uses
-    AsynchReadStream ..> Proactor : Registers Op
-    
-    Acceptor ..> ServerEventHandler : Creates
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/proactor_pattern_simplified_imp_class_diagram.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/proactor_pattern_simplified_imp_class_diagram.svg" alt="Reactor PlantUML Diagram" width="100%">
 
 ### Sequence diagram
 
 - The sequence below depicts the flow of a new client connection and process of received data
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant A as Acceptor
-    participant S as ServerEventHandler
-    participant P as Proactor Thread
-    participant AR as AsynchReadStream
-
-    C->>A: Connect (TCP SYN)
-    activate A
-    A->>A: accept() -> newSocketFd
-    A->>S: new ServerEventHandler()
-    A->>S: open(newSocketFd)
-    activate S
-    S->>AR: read(buffer)
-    activate AR
-    AR->>P: startAio()
-    deactivate AR
-    Note over P: Registers Async Op
-    deactivate S
-    deactivate A
-
-    C->>P: Send Data ( "message" )
-    Note over P: Event Loop Detects I/O Completion
-    P->>P: postCompletion()
-    
-    P->>S: handleReadStream(Result)
-    activate S
-    Note over S: Process received data
-    S->>S: Write response or Read more
-    deactivate S
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/proactor_pattern_simplified_imp_1_dynamic.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/proactor_pattern_simplified_imp_1_dynamic.svg" alt="Reactor PlantUML Diagram" width="100%">
 
 - The sequence below continues from the diagram above, where ServerEventHandler writes response data to the client.
 
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/proactor_pattern_simplified_imp_2_dynamic.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/proactor_pattern_simplified_imp_2_dynamic.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant A as Acceptor
-    participant S as ServerEventHandler
-    participant P as Proactor Thread
-    participant AW as AsynchWriteStream
-
-    S->>AW: write(buffer)
-    activate S
-    deactivate S
-    activate AW
-    AW->>P: startAio()
-    Note over P: Registers Async Op
-    deactivate AW
-    P->>C: Send Data ( "Echo - message" )
-    Note over P: Event Loop Detects I/O Completion
-    P->>P: postCompletion()
-    P->>S: handleWriteStream(Result)
-    activate S
-    deactivate S
-```
 
 ### Directory and file structure
 Related source files:

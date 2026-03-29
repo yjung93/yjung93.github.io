@@ -1,0 +1,69 @@
+@startuml
+
+top to bottom direction
+
+skinparam style strictuml
+skinparam sameClassWidth true
+skinparam nodesep 100
+skinparam minClassWidth 130
+
+' Framework Classes
+package Framework {
+    class Proactor {
+        +getInstance(): Proactor
+        +proactorRunEventLoop()
+        +startAio(result, opcode)
+        +handleEvents()
+        -postCompletion(result)
+    }
+
+    class Handler {
+        +handleReadStream(result)
+        +handleWriteStream(result)
+        +proactor()
+    }
+
+    class ServiceHandler {
+        +open(handle)
+        +addresses()
+    }
+
+    class AsynchResult {
+        +complete()
+        +bytes_transferred()
+        +success()
+    }
+
+    class AsynchReadStream {
+        +read(buffer, size, ...)
+        +open(handler, handle)
+    }
+}
+
+' Application Classes
+package Application {
+    class Acceptor {
+        +handleInput(fd)
+        +open()
+    }
+
+    class ServerEventHandler {
+        +open(handle)
+        +handleReadStream(result)
+        +handleWriteStream(result)
+    }
+}
+
+' Relationships
+Handler <|-- ServiceHandler
+ServiceHandler <|-down- ServerEventHandler
+
+Proactor "1" o-- "*" AsynchResult : Manages
+Handler ..> AsynchResult : Receives
+
+ServerEventHandler --> AsynchReadStream : Uses
+AsynchReadStream ..> Proactor : Registers Op
+
+Acceptor .right.> ServerEventHandler : Creates
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 20
+
+
+participant ":Client" as C
+participant ":Acceptor" as A
+participant ":ServerEventHandler" as S
+participant ":Proactor Thread" as P
+participant ":AsynchReadStream" as AR
+
+C -> A: Connect (TCP SYN)
+activate A
+A -> A: accept() -> newSocketFd
+A -> S: new ServerEventHandler()
+A -> S: open(newSocketFd)
+activate S
+S -> AR: read(buffer)
+activate AR
+AR -> P: startAio()
+deactivate AR
+note over P: Registers Async Op
+deactivate S
+deactivate A
+
+C -> P: Send Data ( "message" )
+note over P: Event Loop Detects I/O Completion
+P -> P: postCompletion()
+
+P -> S: handleReadStream(Result)
+activate S
+note over S: Process received data
+S -> S: Write response or Read more
+deactivate S
+@enduml

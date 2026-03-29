@@ -1,0 +1,40 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 20
+skinparam sameClassWidth true
+
+participant ":Initiator" as I
+participant ":Asynchronous Operation\nProcessor" as AOP
+participant ":Asynchronous Operation" as AO
+participant ":Completion Event Queue" as CEQ
+participant ":Proactor" as P
+participant ":Completion Handler" as CH
+
+I -> AOP: execute_async_operation()
+activate AOP
+
+AOP -> AO: async_operation()
+activate AO
+
+I -> P: handle_events()
+activate P
+
+AO -> AO: event
+AO --> AOP: Result
+deactivate AO
+
+AOP -> CEQ: enqueue(Result)
+deactivate AOP
+
+CEQ --> P: event
+
+P -> CH: handle_event(Result)
+activate CH
+
+CH -> CH: service()
+CH --> P: (done)
+deactivate CH
+
+deactivate P
+@enduml

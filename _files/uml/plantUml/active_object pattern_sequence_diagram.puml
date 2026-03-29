@@ -1,0 +1,82 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 20
+skinparam sameClassWidth true
+
+participant ": Client" as Client
+participant ": Proxy" as Proxy
+participant ": Scheduler" as Scheduler
+participant ": Activation List" as ActList
+participant ": Servant" as Servant
+
+activate Client
+
+Client -> Proxy : method()
+activate Proxy
+
+create participant ": Future" as Future
+Proxy -> Future : <<create>>
+
+create participant ": Method Request" as MethodRequest
+' Passing the Future as a parameter to the MethodRequest creation
+Proxy -> MethodRequest : <<create>>\n[Future]
+
+Proxy -> Scheduler : insert()\n[Method Request]
+activate Scheduler
+
+Scheduler -> ActList : insert()
+activate ActList
+ActList --> Scheduler
+deactivate ActList
+
+Scheduler --> Proxy
+deactivate Scheduler
+
+Proxy --> Client : [Future]
+deactivate Proxy
+
+' The zig-zag lines representing a break/delay in time
+... Asynchronous Execution Boundary ...
+
+' Scheduler runs in its own active thread
+Scheduler -> Scheduler : dispatch()
+activate Scheduler
+
+Scheduler -> MethodRequest : can_run()
+activate MethodRequest
+MethodRequest --> Scheduler
+deactivate MethodRequest
+
+Scheduler -> ActList : remove()
+activate ActList
+ActList --> Scheduler : [Method Request]
+deactivate ActList
+
+Scheduler -> MethodRequest : call()
+activate MethodRequest
+
+MethodRequest -> Servant : method()
+activate Servant
+Servant --> MethodRequest : [Result]
+deactivate Servant
+
+MethodRequest -> Future : <<write to future>>\n[Result]
+activate Future
+Future --> MethodRequest
+deactivate Future
+
+MethodRequest --> Scheduler
+deactivate MethodRequest
+deactivate Scheduler
+
+...
+
+' Client eventually reads the result from the Future
+Client -> Future : <<read from future>>
+activate Future
+Future --> Client : [Result]
+deactivate Future
+
+deactivate Client
+@enduml

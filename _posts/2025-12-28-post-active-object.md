@@ -9,16 +9,18 @@ tags:
 
 **Table of Contents**
 - [Overview](#overview)
-- [Active Object pattern](#active-object-pattern)
+- [Active Object pattern \[POSA2\]](#active-object-pattern-posa2)
   - [Background](#background)
   - [Solution](#solution)
   - [Structure](#structure)
+    - [Class diagram](#class-diagram)
+    - [Dynamic](#dynamic)
 - [Simplified version of Implementation](#simplified-version-of-implementation)
   - [Design Choices](#design-choices)
   - [Component Mapping](#component-mapping)
   - [Framework Layer](#framework-layer)
   - [Application Layer](#application-layer)
-  - [Class diagram](#class-diagram)
+  - [Class diagram](#class-diagram-1)
   - [Sequence diagram](#sequence-diagram)
     - [Use Case: client waits synchronously](#use-case-client-waits-synchronously)
     - [Use Case: Client is triggered by callback asynchronously.](#use-case-client-is-triggered-by-callback-asynchronously)
@@ -28,12 +30,12 @@ tags:
 ## Overview
 
 This post covers the following topics:
-- The **Active Object pattern** [[POSA2](/references/post-references)] for untangling method execution from method invocation to maintain high concurrency.
+- The **Active Object pattern** for untangling method execution from method invocation to maintain high concurrency.
 - A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
-## Active Object pattern
+## Active Object pattern [[POSA2](/references/post-references)]
 
-The **Active Object pattern** [[POSA2](/references/post-references)], also known as Concurrent Object, decouples method execution from method invocation to enhance concurrency and simplify synchronized access to objects that reside in different threads.
+The **Active Object pattern** also known as Concurrent Object, decouples method execution from method invocation to enhance concurrency and simplify synchronized access to objects that reside in different threads.
 
 ### Background
 In a multi-threaded system, objects run concurrently, and we must synchronize access to their methods and data if they are shared and modified by multiple threads. In this case, the following constraints should be considered:
@@ -61,36 +63,16 @@ The Active Object pattern consists of the following six components:
 + **Servant**: Defines the behavior and state modeled by an active object. The methods implemented by the servant correspond to the interface provided by the proxy. Its methods are executed by the scheduler in the thread where the scheduler runs. 
 + **Future**: The client receives a Future object after invoking the interface. The client obtains the result of the method invocation via the Future once the servant finishes executing the method. The client can retrieve the result data by a synchronous wait (blocked wait) or an asynchronous callback.
 
-```mermaid
-flowchart LR
-    %% Layout
-    subgraph Client_Thread [Client Thread]
-        C[Client]
-        P[Proxy]
-    end
+#### Class diagram
 
-    subgraph Shared [Synchronization]
-        direction TB
-        Q[[Activation Queue]]
-        F[(Future)]
-    end
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/active_object pattern_class_diagram.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/active_object pattern_class_diagram.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-    subgraph Execution_Thread [Execution Thread]
-        S[Scheduler]
-        SV[Servant]
-    end
+#### Dynamic
 
-    %% Interactions
-    C -->|1. method call| P
-    P -->|2. enqueue MethodRequest| Q
-    P -.->|3. return Future| C
-    
-    Q -->|4. dequeue| S
-    S -->|5. execute| SV
-    SV -.->|6. set result| F
-    
-    C -.->|7. get result| F
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/active_object pattern_sequence_diagram.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/active_object pattern_sequence_diagram.svg" alt="Reactor PlantUML Diagram" width="100%">
+
 
 ## Simplified version of Implementation
 
@@ -147,138 +129,19 @@ To implement this pattern, I mapped the standard Active Object components to the
 
 ### Class diagram
 
-```mermaid
-classDiagram
-direction TB
-
-  class ActivationQueue {
-      +enqueue(MethodRequest*)
-      +dequeue() MethodRequest*
-  }
-  class Future~T~ {
-      +get() T
-      +set(T)
-      +attach(FutureObserver*)
-  }
-  class FutureRep~T~ {
-      +get()
-      +set()
-  }
-  class ActObjScheduler {
-      +enqueue(MethodRequest*)
-      +svc()
-  }
-  class ActObjServant {
-      +RequestGetReturnMessage(string) string
-  }
-  class ActObjServantProxy {
-      +requestGetReturnMessage(string) Future~string~
-  }
-  class MethodRequest {
-      << interface >>
-      +call() int
-  }
-  class RequestGetReturnMessage {
-      +call() int
-  }
-  
-  ActObjScheduler --> ActivationQueue : owns
-  ActObjServantProxy --> ActObjScheduler : uses
-  ActObjServantProxy --> ActObjServant : owns
-  ActObjServantProxy ..> RequestGetReturnMessage : creates
-  RequestGetReturnMessage --|> MethodRequest
-  RequestGetReturnMessage --> ActObjServant : delegates to
-  RequestGetReturnMessage --> Future : updates
-  ActObjScheduler ..> MethodRequest : executes
-  Future *-- FutureRep : shares
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/active_object pattern_simplified_imp_class_diagram.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/active_object pattern_simplified_imp_class_diagram.svg" alt="Reactor PlantUML Diagram" width="100%">
 
 ### Sequence diagram
 
 #### Use Case: client waits synchronously
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Proxy as ActObjServantProxy
-    participant Scheduler as ActObjScheduler
-    participant Queue as ActivationQueue
-    participant Request as RequestGetReturnMessage
-    participant Servant as ActObjServant
-    participant Future as Future
-
-    Note over Client, Proxy: Client Thread
-    Client->>Proxy: requestGetReturnMessage("Hello")
-    activate Proxy
-    Proxy->>Future: create (via Future)
-    Proxy->>Request: create
-    Proxy->>Scheduler: enqueue(Request)
-    Scheduler->>Queue: enqueue(Request)
-    Proxy-->>Client: return Future
-    deactivate Proxy
-
-    Client->>Future: get() (blocks)
-    
-    Note over Scheduler, Servant: Scheduler Thread
-  
-    loop Scheduler Loop
-        Scheduler->>Queue: dequeue()
-        Queue-->>Scheduler: Request
-        Scheduler->>Request: call()
-        activate Request
-        Request->>Servant: RequestGetReturnMessage("Hello")
-        Servant-->>Request: "Echo - Hello"
-        Request->>Future: set("Echo - Hello")
-        deactivate Request
-    end
-   
-    Future-->>Client: "Echo - Hello"
-
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/active_object pattern_simplified_imp_dynamic_sync.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/active_object pattern_simplified_imp_dynamic_sync.svg" alt="Reactor PlantUML Diagram" width="100%">
 
 #### Use Case: Client is triggered by callback asynchronously.
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Proxy as ActObjServantProxy
-    participant Scheduler as ActObjScheduler
-    participant Queue as ActivationQueue
-    participant Request as RequestGetReturnMessage
-    participant Servant as ActObjServant
-    participant Future as Future
-    participant CallBack as CallbackGetReturnMessage
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/active_object pattern_simplified_imp_dynamic_async.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/active_object pattern_simplified_imp_dynamic_async.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-    Note over Client, Proxy: Client Thread
-    Client->>Proxy: requestGetReturnMessage("Hello")
-    activate Proxy
-    Proxy->>Future: create 
-    Proxy->>Request: create
-    Proxy->>Scheduler: enqueue(Request)
-    Scheduler->>Queue: enqueue(Request)
-    Proxy-->>Client: return Future
-    deactivate Proxy
-    Client->>CallBack : create 
-    Client->>Future: attach(CallbackGetReturnMessage)
-
-    Note over Scheduler, Servant: Scheduler Thread
-  
-    loop Scheduler Loop
-        Scheduler->>Queue: dequeue()
-        Queue-->>Scheduler: Request
-        Scheduler->>Request: call()
-        activate Request
-        Request->>Servant: RequestGetReturnMessage("Hello")
-        Servant-->>Request: "Echo - Hello"
-        Request->>Future: set("Echo - Hello")
-        Future-->>CallBack: update 
-        deactivate Request
-    end
-
-    CallBack-->>Client: update(future)
-    Client->>Future: get()
-    Future-->>Client: "Echo - Hello"
-
-```
 
 ### Directory and file structure
 Related source files:

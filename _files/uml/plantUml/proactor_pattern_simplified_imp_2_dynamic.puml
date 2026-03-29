@@ -1,0 +1,30 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 20
+
+
+participant ":Client" as C
+participant ":Acceptor" as A
+participant ":ServerEventHandler" as S
+participant ":Proactor Thread" as P
+participant ":AsynchWriteStream" as AW
+
+S -> AW: write(buffer)
+activate S
+deactivate S
+
+activate AW
+AW -> P: startAio()
+note over P: Registers Async Op
+deactivate AW
+
+P -> C: Send Data ( "Echo - message" )
+note over P: Event Loop Detects I/O Completion
+
+P -> P: postCompletion()
+P -> S: handleWriteStream(Result)
+
+activate S
+deactivate S
+@enduml
