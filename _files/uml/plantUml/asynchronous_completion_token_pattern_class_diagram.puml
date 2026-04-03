@@ -1,0 +1,36 @@
+@startuml
+
+skinparam style strictuml
+skinparam sameClassWidth true
+skinparam nodesep 100
+skinparam minClassWidth 130
+
+hide empty members
+
+class "Completion\nHandler" as CompletionHandler {
+  handle_event()
+}
+
+class Initiator {
+  completion_action()
+}
+
+class Service {
+  operation()
+}
+
+class "Asynchronous\nCompletion\nToken" as ACT
+
+' Horizontal relationships (Top row)
+Initiator .left.> "1..*" CompletionHandler : <<demultiplexes>>
+Initiator -right- Service : calls operations
+
+' Vertical relationships (Bottom row)
+' Open diamond represents Aggregation touching the Initiator
+Initiator o-down- "1..*" ACT 
+Service -down- "1..*" ACT
+
+' Diagonal/Routed relationship
+CompletionHandler ..> ACT : <<uses>>
+
+@enduml

@@ -1,6 +1,6 @@
 @startuml
 
-top to bottom direction
+' top to bottom direction
 
 skinparam style strictuml
 skinparam sameClassWidth true
@@ -56,13 +56,13 @@ package Application {
 
 ' Relationships
 Handler <|-- ServiceHandler
-ServiceHandler <|-down- ServerEventHandler
+ServiceHandler <|-- ServerEventHandler
 
 Proactor "1" o-- "*" AsynchResult : Manages
-Handler ..> AsynchResult : Receives
+Handler .left.> AsynchResult : Receives
 
 ServerEventHandler --> AsynchReadStream : Uses
-AsynchReadStream ..> Proactor : Registers Op
+AsynchReadStream .left.> Proactor : Registers Op
 
 Acceptor .right.> ServerEventHandler : Creates
 

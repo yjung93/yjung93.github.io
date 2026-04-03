@@ -1,0 +1,37 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 60
+
+participant ": Initiator" as Initiator
+participant ": Completion Handler" as Handler
+participant ": Service" as Service
+
+activate Initiator
+
+' Initiator dynamically creates the ACT
+create participant ": ACT" as ACT
+Initiator -> ACT :create()
+
+' Pass ACT as a parameter
+Initiator -> Service : operation()\n[ACT]
+activate Service
+
+' The zig-zag line indicating a passage of time/asynchronous processing
+... Other initiator processing ...
+
+' Service completes and notifies the Initiator
+Service -> Initiator : notify()\n[ACT, result]
+deactivate Service
+
+' Initiator handles the internal completion action
+Initiator -> Initiator : completion_action()
+activate Initiator
+
+' Initiator delegates the result to the Completion Handler
+Initiator -> Handler : process_result()\n[result]
+activate Handler
+
+deactivate Initiator
+deactivate Initiator
+@enduml

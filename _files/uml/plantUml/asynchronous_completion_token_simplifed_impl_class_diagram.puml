@@ -1,0 +1,42 @@
+@startuml
+' left to right direction
+' top to bottom direction
+
+skinparam style strictuml
+
+package Application {
+    class ServerEventHandler {
+        +handleReadStream(result)
+        +initiateOp()
+    }
+}
+
+package Framework {
+    class AsynchResult {
+        +complete()
+    }
+
+    class AsynchReadStream {
+        +read()
+    }
+
+    class AsynchWriteStream {
+        +write()
+    }
+    
+    class Handler {
+        +handleReadStream(result: AsynchResult)
+        +handleWriteStream(result: AsynchResult)
+    }
+}
+
+
+
+' Relationships
+
+AsynchReadStream -up-|> AsynchResult
+ServerEventHandler .up.> AsynchReadStream : Calls read()
+ServerEventHandler .up.> AsynchResult : Reads result 
+AsynchResult "1" *-right- "1" Handler : Proxy to Callback
+Handler <|-down- ServerEventHandler
+@enduml

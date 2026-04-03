@@ -9,7 +9,7 @@ tags:
 
 **Table of Contents**
 - [Overview](#overview)
-- [Asynchronous Completion Token (ACT) pattern](#asynchronous-completion-token-act-pattern)
+- [Asynchronous Completion Token (ACT) pattern \[POSA2\]](#asynchronous-completion-token-act-pattern-posa2)
   - [Background](#background)
   - [Solution](#solution)
   - [Structure](#structure)
@@ -28,12 +28,12 @@ tags:
 ## Overview
 
 This post covers the following topics:
-- The **Asynchronous Completion Token pattern** [[POSA2](/references/post-references)] for efficiently managing state in asynchronous operations.
+- The **Asynchronous Completion Token pattern**  for efficiently managing state in asynchronous operations.
 - A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html). The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
 
-## Asynchronous Completion Token (ACT) pattern
+## Asynchronous Completion Token (ACT) pattern [[POSA2](/references/post-references)]
 
-The **Asynchronous Completion Token (ACT)** [[POSA2](/references/post-references)], also known as *Active Demultiplexing*, lets an application efficiently demultiplex and process the results of asynchronous operations that the application initiated.
+The **Asynchronous Completion Token (ACT)** also known as *Active Demultiplexing*, lets an application efficiently demultiplex and process the results of asynchronous operations that the application initiated.
 
 ### Background
 In a multi-threaded system, a client application may invoke operations on services and later receive the results asynchronously via completion events. When a completion event arrives, the client is responsible for demultiplexing it to the correct completion handler so the result can be processed.
@@ -65,51 +65,14 @@ The Asynchronous Completion Token pattern has four participants:
 
 
 #### Class diagram
-```mermaid
-classDiagram
-direction LR
 
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/asynchronous_completion_token_pattern_class_diagram.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/asynchronous_completion_token_pattern_class_diagram.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-    class Initiator {
-        +completion_action()
-    }
-    class Service {
-        +operation()
-    }
-    class CompletionHandler {
-        +handle_event()
-    }
-    class AsynchronousCompletionToken {
-    }
-
-    Initiator "1" --> "*" CompletionHandler : << demultiplexes >>
-    Initiator --> Service : calls operations
-    Initiator o-- "1..*" AsynchronousCompletionToken
-    Service -- "1..*" AsynchronousCompletionToken
-    CompletionHandler ..> AsynchronousCompletionToken : << uses >>
-
-```
 #### Dynamic
-```mermaid
-sequenceDiagram
-    participant I as :Initiator
-    participant CH as :Completion Handler
-    participant ACT as :ACT
-    participant S as :Service
 
-    I->>ACT: create
-    I->>S: operation(ACT)
-    
-    Note over I: Other initiator processing
-    
-    S->>I: notify(ACT, result)
-    activate I
-    I->>I: completion_action()
-    I->>CH: process_result(result)
-    activate CH
-    deactivate CH
-    deactivate I
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/asynchronous_completion_token_pattern_dynamic.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/asynchronous_completion_token_pattern_dynamic.svg" alt="Reactor PlantUML Diagram" width="100%">
 
 
 ## Simplified version of Implementation
@@ -157,73 +120,16 @@ The example application demonstrates a hybrid approach where:
 The following diagram illustrates the relationship between the participants of the Asynchronous Completion Token pattern and the application classes.
 This diagram focuses on the classes involved in transporting the Asynchronous Completion Token.
 
-```mermaid
-classDiagram
-direction LR
-    namespace Framework {
-        class AsynchResult {
-            +complete()
-        }
-
-        class AsynchReadStream {
-            +read()
-        }
-
-        class AsynchWriteStream {
-            +write()
-        }
-        
-        class Handler {
-            +handleReadStream(result: AsynchResult)
-            +handleWriteStream(result: AsynchResult)
-        }
-    }
-    
-    namespace Application {
-        class ServerEventHandler {
-            +handleReadStream(result)
-            +initiateOp()
-        }
-    }
-
-    Handler <|-- ServerEventHandler
-    AsynchReadStream --|> AsynchResult
-    ServerEventHandler ..> AsynchReadStream : Calls read()
-    ServerEventHandler ..> AsynchResult : Reads result 
-    AsynchResult "1" *-- "1" Handler : Proxy to Callback
-```
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/asynchronous_completion_token_simplifed_impl_class_diagram.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/asynchronous_completion_token_simplifed_impl_class_diagram.svg" alt="Reactor PlantUML Diagram" width="80%">
 
 ### Sequence diagram
 
 The sequence below illustrates the lifecycle of the ACT: from passing it during initiation to retrieving it during completion.
 
-```mermaid
-sequenceDiagram
-    participant App as ServerEventHandler
-    participant Factory as AsynchReadStream
-    participant Result as AsynchReadStreamResult:<br>AsynchResult
-    participant Framework as Proactor
+<!-- [AI Note]: The diagram below is generated from /_files/uml/plantUml/asynchronous_completion_token_simplifed_impl_dynamic.puml -->
+<img src="{{ site.baseurl }}/assets/images/uml/plantUml/asynchronous_completion_token_simplifed_impl_dynamic.svg" alt="Reactor PlantUML Diagram" width="100%">
 
-    App->>Factory: read(buffer, size)
-    activate Factory
-    Factory->>Result: create
-
-    Factory->>Framework: startAio(AsynchResult)
-    Note over Framework: Stores AsynchResult ( ACT )
-    deactivate Factory
-    
-    Note over Framework: Operation Pending...
-    
-    Framework->>Result: complete(...)
-    activate Result
-    Result->>App: handleReadStream(AsynchResult)
-    activate App
-    App->>Result: message()
-    Result-->>App: returns message
-    Note over App: Process message fetched form AsynchResult ( ACT )
-    deactivate App
-    deactivate Result
-```
 
 ### Directory and file structure
 Related source files:

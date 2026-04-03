@@ -35,7 +35,7 @@ class ConcreteCompletionHandler
 
 Initiator -down-> AsynchronousOperationProcessor : << uses >>
 Initiator -down-> AsynchronousOperation : << invokes >>
-Initiator -down-> CompletionHandler : << uses >>
+Initiator -right-> CompletionHandler : << uses >>
 Initiator -down-> CompletionEventQueue : << uses >>
 
 AsynchronousOperationProcessor .right.> AsynchronousOperation : << concurrency >>

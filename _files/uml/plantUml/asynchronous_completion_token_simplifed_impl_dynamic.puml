@@ -1,0 +1,35 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 20
+
+
+participant ":ServerEventHandler\n" as App
+participant ":AsynchReadStream\n" as Factory
+participant "AsynchReadStreamResult\n:AsynchResult" as Result
+participant ":Proactor\n" as Framework
+
+App -> Factory: read(buffer, size)
+activate Factory
+
+Factory -> Result: create
+
+Factory -> Framework: startAio(AsynchResult)
+note over Framework: Stores AsynchResult ( ACT )
+deactivate Factory
+
+note over Framework: Operation Pending...
+
+Framework -> Result: complete(...)
+activate Result
+
+Result -> App: handleReadStream(AsynchResult)
+activate App
+
+App -> Result: message()
+Result --> App: returns message
+note over App: Process message fetched\nform AsynchResult ( ACT )
+
+deactivate App
+deactivate Result
+@enduml
