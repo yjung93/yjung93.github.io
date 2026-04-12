@@ -1,0 +1,168 @@
+@startuml
+
+skinparam style strictuml
+
+participant "Client Application" as ClientApp
+participant "Connector" as Conn
+participant "Reactor" as ReactorC
+participant "Server Application" as ServerApp
+participant "Acceptor" as Acc
+participant "Reactor" as ReactorS
+
+' ============================
+' SERVER SIDE: Acceptor Setup
+' ============================
+activate ServerApp
+ServerApp -> Acc : open
+activate Acc
+Acc -> ReactorS : registerHandler
+deactivate Acc
+deactivate ServerApp
+
+' ============================
+' CLIENT SIDE: Connector Setup
+' ============================
+activate ClientApp
+ClientApp -> Conn : connect
+activate Conn
+
+' makeSvcHandler
+Conn -> Conn : makeSvcHandler
+activate Conn
+create participant "OutputHandler" as OH
+Conn -> OH : create
+deactivate Conn
+
+' connectSvcHandler
+Conn -> Conn : connectSvcHandler
+activate Conn
+
+Conn -> OH : peer
+activate OH
+OH --> Conn
+deactivate OH
+
+' connect (nested inside connectSvcHandler)
+Conn -> Conn : connect
+activate Conn
+
+' The TCP connect goes across to the server-side Reactor
+Conn -> ReactorS : connect
+
+' nonblockingConnect (nested inside connect)
+Conn -> Conn : nonblockingConnect
+activate Conn
+create participant "NonBlockingConnectHandler" as NBCH
+Conn -> NBCH : create
+Conn -> ReactorC : registerHandler( NonBlockingConnectHandler * )
+deactivate Conn
+
+deactivate Conn
+deactivate Conn
+deactivate Conn
+
+' ============================
+' SERVER SIDE: Acceptor Handles Incoming Connection
+' ============================
+ReactorS -> Acc : handleInput
+activate Acc
+
+' makeSvcHandler
+Acc -> Acc : makeSvcHandler
+activate Acc
+create participant "InputHandler" as IH
+Acc -> IH : create
+deactivate Acc
+
+' acceptSvcHandler
+Acc -> Acc : acceptSvcHandler
+activate Acc
+Acc -> IH : peer
+activate IH
+IH --> Acc
+deactivate IH
+
+' accept (nested inside acceptSvcHandler)
+Acc -> Acc : accept
+activate Acc
+deactivate Acc
+
+deactivate Acc
+
+' activeSvcHandler
+Acc -> Acc : activeSvcHandler
+activate Acc
+Acc -> IH : open
+activate IH
+IH -> ReactorS : registerHandler
+deactivate IH
+deactivate Acc
+
+deactivate Acc
+
+' ============================
+' CLIENT SIDE: NonBlockingConnectHandler Completes
+' ============================
+|||
+|||
+
+ReactorC -> NBCH : handleOutput
+activate NBCH
+
+NBCH -> Conn : initializeSvcHandler
+activate Conn
+
+NBCH -> ReactorC : removeHandler
+
+' Destroy the NonBlockingConnectHandler (draws the X)
+destroy NBCH
+
+Conn -> Conn : activeSvcHandler
+activate Conn
+Conn -> OH : open
+activate OH
+OH -> ReactorC : registerHandler( this )
+deactivate OH
+deactivate Conn
+
+deactivate Conn
+
+' ============================
+' MESSAGE EXCHANGE PHASE
+' ============================
+|||
+|||
+
+' External message arrives at the Client Application
+[-> ClientApp : message
+activate ClientApp
+
+ClientApp -> OH : sendMessage
+activate OH
+
+OH -> OH : send_n
+activate OH
+deactivate OH
+
+deactivate OH
+
+' Message travels across the network to the server side
+ReactorS -> IH : message
+activate IH
+
+IH -> IH : handleInput
+activate IH
+
+' Echo message back
+IH -> ReactorC : Echo message
+deactivate IH
+deactivate IH
+
+' Client side receives the echo
+ReactorC -> OH : handleInput
+activate OH
+OH ->[ : display received message
+deactivate OH
+
+deactivate ClientApp
+@enduml

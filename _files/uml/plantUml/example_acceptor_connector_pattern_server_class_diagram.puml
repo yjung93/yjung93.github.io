@@ -1,0 +1,19 @@
+@startuml
+skinparam linetype ortho
+skinparam style strictuml
+skinparam nodesep 150
+skinparam sameClassWidth true
+hide empty members
+
+class ServiceHandler<PEER_STREAM>
+class InputHandler
+
+class Acceptor<InputHandler, PEER_ACCEPTOR>
+class AcceptorImpl
+
+ServiceHandler <|-- InputHandler
+Acceptor <|-- AcceptorImpl
+
+Acceptor ..> InputHandler : <<create>>
+
+@enduml

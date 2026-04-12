@@ -1,0 +1,65 @@
+@startuml
+
+skinparam style strictuml
+
+skinparam ParticipantPadding 40
+
+participant ": Application" as App
+participant ": Acceptor" as Acceptor
+participant ": Dispatcher" as Dispatcher
+
+activate App
+App -> Acceptor : open()
+activate Acceptor
+
+Acceptor -> Dispatcher : register_handler()\n[Acceptor | Handle1 | ACCEPT_EVENT]
+activate Dispatcher
+Dispatcher --> Acceptor
+deactivate Dispatcher
+
+Acceptor --> App
+deactivate Acceptor
+
+' Break in the Application lifeline (time gap)
+...
+
+App -> Dispatcher : handle_events()
+activate Dispatcher
+
+Dispatcher -> Acceptor : accept()
+activate Acceptor
+
+' Acceptor creates Handle2
+create participant ": Handle2" as Handle2
+Acceptor -> Handle2 : new
+
+' Acceptor creates Service Handler
+create participant ": Service Handler" as ServiceHandler
+Acceptor -> ServiceHandler : new
+
+Acceptor -> ServiceHandler : open()\n[Handle2]
+activate ServiceHandler
+
+' Service Handler registers with Dispatcher
+ServiceHandler -> Dispatcher : register_handler()\n[Handle2 | Service Handler | Events]
+' (Dispatcher activation box handles the nested call)
+Dispatcher --> ServiceHandler
+
+ServiceHandler --> Acceptor
+deactivate ServiceHandler
+deactivate Acceptor
+
+' Break in the Dispatcher lifeline
+...
+
+Dispatcher -> ServiceHandler : handle_event()
+activate ServiceHandler
+
+' Self-call for the service() method (creates a nested activation)
+ServiceHandler -> ServiceHandler : service()
+activate ServiceHandler
+deactivate ServiceHandler
+
+deactivate ServiceHandler
+deactivate Dispatcher
+@enduml

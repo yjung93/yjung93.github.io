@@ -1,0 +1,72 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 60
+
+participant ": Application" as App
+participant ": Connector" as Connector
+participant ": Service Handler" as ServiceHandler
+participant ": Dispatcher" as Dispatcher
+
+activate App
+
+' Application initiates the connection process
+App -> Connector : connect()\n[Service Handler | Addr]
+activate Connector
+
+' Connector retrieves the handle from the Service Handler
+Connector -> ServiceHandler : get_handle()
+activate ServiceHandler
+ServiceHandler --> Connector : [Handle]
+deactivate ServiceHandler
+
+' Connector registers itself with the Dispatcher for CONNECT events
+Connector -> Dispatcher : register_handler()\n[Handle | Connector | CONNECT EVENT]
+activate Dispatcher
+Dispatcher --> Connector
+deactivate Dispatcher
+
+' Connector returns control to the Application
+Connector --> App
+deactivate Connector
+
+' Break in the Application lifeline (time gap)
+...
+
+' Application starts the event loop
+App -> Dispatcher : handle_events()
+activate Dispatcher
+
+' Dispatcher detects the connection and notifies the Connector
+Dispatcher -> Connector : complete()
+activate Connector
+
+' Connector opens the Service Handler
+Connector -> ServiceHandler : open()
+activate ServiceHandler
+
+' Service Handler registers itself for standard events
+ServiceHandler -> Dispatcher : register_handler()\n[Service Handler | Handle | Events]
+activate Dispatcher
+Dispatcher --> ServiceHandler
+deactivate Dispatcher
+
+' Cascading returns back to the Dispatcher's event loop
+ServiceHandler --> Connector
+deactivate ServiceHandler
+Connector --> Dispatcher
+deactivate Connector
+
+' Dispatcher later detects a normal event and notifies the Service Handler
+Dispatcher -> ServiceHandler : handle_event()
+activate ServiceHandler
+
+' Service Handler processes the event (nested activation)
+ServiceHandler -> ServiceHandler : service()
+activate ServiceHandler
+deactivate ServiceHandler
+
+deactivate ServiceHandler
+deactivate Dispatcher
+deactivate App
+@enduml

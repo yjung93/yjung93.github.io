@@ -1,0 +1,60 @@
+@startuml
+
+skinparam style strictuml
+skinparam ParticipantPadding 60
+
+participant ": Application" as App
+participant ": Connector" as Connector
+participant ": Service Handler" as ServiceHandler
+participant ": Dispatcher" as Dispatcher
+
+activate App
+
+' Application initiates the connection
+App -> Connector : connect()\n[Service Handler | Addr]
+activate Connector
+
+' Connector asks the Service Handler for its handle
+Connector -> ServiceHandler : get_handle()
+activate ServiceHandler
+ServiceHandler --> Connector : [Handle]
+deactivate ServiceHandler
+
+' Connector opens the Service Handler
+Connector -> ServiceHandler : open()
+activate ServiceHandler
+
+' Service Handler registers itself with the Dispatcher
+ServiceHandler -> Dispatcher : register_handler()\n[Service Handler | Handle | Events]
+activate Dispatcher
+Dispatcher --> ServiceHandler
+deactivate Dispatcher
+
+' Cascading returns back to the Application
+ServiceHandler --> Connector
+deactivate ServiceHandler
+
+Connector --> App
+deactivate Connector
+
+' Break in the Application lifeline (time gap)
+...
+
+' Application starts the event loop
+App -> Dispatcher : handle_events()
+activate Dispatcher
+
+' Dispatcher detects an event and notifies the Service Handler
+Dispatcher -> ServiceHandler : handle_event()
+activate ServiceHandler
+
+' Service Handler processes the event (nested activation)
+ServiceHandler -> ServiceHandler : service()
+activate ServiceHandler
+deactivate ServiceHandler
+
+' Close all remaining activations
+deactivate ServiceHandler
+deactivate Dispatcher
+deactivate App
+@enduml

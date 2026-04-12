@@ -1,0 +1,37 @@
+@startuml
+
+skinparam style strictuml
+' skinparam sameClassWidth true
+skinparam nodesep 80
+skinparam minClassWidth 200
+hide empty members
+
+class Reactor
+class "Event Handler" as EventHandler
+
+class Acceptor<SVC_HANDLE, PEER_ACCEPTOR>
+class Connector<SVC_HANDLE, PEER_CONNECTOR>
+class ServiceHandler<PEER_STREAM>
+
+class "Application Service" as ApplicationService
+
+' Reactor and Event Handler relationships
+Reactor "  ".right.> EventHandler
+Reactor  "0..n"<-right- EventHandler
+
+' Inheritance hierarchy
+EventHandler <|-down- Acceptor
+EventHandler <|-down- Connector
+EventHandler <|-down- ServiceHandler
+
+ServiceHandler <|-- ApplicationService
+
+' Creation dependencies
+Acceptor ..> ApplicationService : <<create>>
+Connector ..> ApplicationService : <<create>>
+
+' Hidden links to enforce the left-to-right layout of the child classes
+Acceptor -[hidden]right- Connector
+Connector -[hidden]right- ServiceHandler
+
+@enduml

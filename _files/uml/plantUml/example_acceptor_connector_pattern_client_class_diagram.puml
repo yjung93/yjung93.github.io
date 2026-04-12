@@ -1,0 +1,28 @@
+@startuml
+skinparam linetype ortho
+skinparam style strictuml
+skinparam nodesep 150
+skinparam sameClassWidth true
+' skinparam minClassWidth 150
+
+hide empty members
+
+class ServiceHandler<PEER_STREAM>
+class OutputHandler
+
+class Connector<OutputHandler, PEER_CONNECTOR>
+class ConnectorImpl
+
+class Client
+
+ServiceHandler <|-- OutputHandler
+Connector <|-- ConnectorImpl
+
+Connector ..> OutputHandler : <<create>>
+
+' Shared composition structure to Client
+
+ Client *--up OutputHandler
+ Client *--up ConnectorImpl
+
+@enduml

@@ -1,0 +1,77 @@
+@startuml
+
+skinparam style strictuml
+
+skinparam ParticipantPadding 60
+skinparam sameClassWidth true
+
+participant "Application" as App
+participant ":Acceptor" as Acc
+participant ":Reactor" as Reactor
+
+' Initial setup phase
+activate App
+
+App -> Acc : open
+activate Acc
+
+Acc -> Reactor : registerHandler
+activate Reactor
+Reactor --> Acc
+deactivate Reactor
+
+deactivate Acc
+deactivate App
+
+' Space out the two phases
+|||
+
+' External event triggers the Reactor
+[-> Reactor : connect request from client
+activate Reactor
+
+' Reactor notifies Acceptor
+Reactor -> Acc : handleInput
+activate Acc
+
+' 1st nested call: makeSvcHandler
+Acc -> Acc : makeSvcHandler
+activate Acc
+create participant ":ServerEventHandler" as SEH
+Acc -> SEH : create
+deactivate Acc
+
+' 2nd nested call: acceptSvcHandler
+Acc -> Acc : acceptSvcHandler
+activate Acc
+Acc -> SEH : peer
+activate SEH
+SEH --> Acc
+deactivate SEH
+deactivate Acc
+
+' 3rd nested call: accept
+Acc -> Acc : accept
+activate Acc
+deactivate Acc
+
+' 4th nested call: activeSvcHandler
+Acc -> Acc : activeSvcHandler
+activate Acc
+Acc -> SEH : open
+activate SEH
+
+' ServerEventHandler registers with Reactor
+SEH -> Reactor : registerHandler
+activate Reactor
+deactivate Reactor
+
+deactivate SEH
+deactivate Acc
+
+' Final return from the Acceptor back to the Reactor
+Acc --> Reactor
+deactivate Acc
+deactivate Reactor
+
+@enduml

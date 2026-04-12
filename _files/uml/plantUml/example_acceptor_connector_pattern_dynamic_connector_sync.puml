@@ -1,0 +1,57 @@
+@startuml
+
+skinparam style strictuml
+
+skinparam ParticipantPadding 60
+skinparam sameClassWidth true
+
+participant "Application" as App
+participant "Connector" as Conn
+participant "Reactor" as Reactor
+
+activate App
+
+' Application initiates connection
+App -> Conn : connect
+activate Conn
+
+' 1st nested call: makeSvcHandler
+Conn -> Conn : makeSvcHandler
+activate Conn
+' Dynamically create the ServerEventHandler exactly when the create message is sent
+create participant "ServerEventHandler" as SEH
+Conn -> SEH : create
+deactivate Conn
+
+' 2nd nested call: connectSvcHandler
+Conn -> Conn : connectSvcHandler
+activate Conn
+
+Conn -> SEH : peer
+activate SEH
+SEH --> Conn
+deactivate SEH
+
+' 3rd nested call (nested inside connectSvcHandler): connect
+Conn -> Conn : connect
+activate Conn
+deactivate Conn
+
+deactivate Conn
+
+' 4th nested call: activeSvcHandler
+Conn -> Conn : activeSvcHandler
+activate Conn
+
+Conn -> SEH : open
+activate SEH
+
+' ServerEventHandler registers with the Reactor
+SEH -> Reactor : registerHandler
+
+' Close out all remaining activations cleanly
+deactivate SEH
+deactivate Conn
+deactivate Conn
+deactivate App
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+
+skinparam style strictuml
+
+participant "Application" as App
+participant "Connector" as Conn
+participant "Reactor" as Reactor
+
+activate App
+
+' Application initiates the connection
+App -> Conn : connect
+activate Conn
+
+' 1st nested call: makeSvcHandler
+Conn -> Conn : makeSvcHandler
+activate Conn
+' Dynamically create the ServerEventHandler
+create participant "ServerEventHandler" as SEH
+Conn -> SEH : create
+deactivate Conn
+
+' 2nd nested call: connectSvcHandler
+Conn -> Conn : connectSvcHandler
+activate Conn
+
+' peer call
+Conn -> SEH : peer
+activate SEH
+SEH --> Conn
+deactivate SEH
+
+' 3rd nested call (inside connectSvcHandler): connect
+Conn -> Conn : connect
+activate Conn
+
+' 4th nested call (inside connect): nonblockingConnect
+Conn -> Conn : nonblockingConnect
+activate Conn
+
+' Dynamically create the NonBlockingConnectHandler
+create participant "NonBlockingConnectHandler" as NBCH
+Conn -> NBCH : create
+
+' Register with the Reactor
+Conn -> Reactor : registerHandler( NonBlockingConnectHandler * )
+
+' Close out the nested activations
+deactivate Conn
+deactivate Conn
+deactivate Conn
+
+' Close the main Connector activation block
+deactivate Conn
+
+' Add vertical spacing to denote a passage of time / event loop gap
+|||
+|||
+
+' Async callback from the Reactor
+Reactor -> NBCH : handleOutput
+activate NBCH
+
+' Handler initializes the service
+NBCH -> Conn : initializeSvcHandler
+activate Conn
+
+' Nested call on Connector to activate the service
+Conn -> Conn : activeSvcHandler
+activate Conn
+
+' Connector opens the ServerEventHandler
+Conn -> SEH : open
+activate SEH
+
+' ServerEventHandler registers itself with the Reactor
+SEH -> Reactor : registerHandler( this )
+deactivate SEH
+
+deactivate Conn
+deactivate Conn
+
+' Cleanup phase for the NonBlockingConnectHandler
+NBCH -> Reactor : removeHandler
+
+' Destroy the object (draws the 'X' at the bottom of the lifeline)
+destroy NBCH
+
+deactivate App
+@enduml

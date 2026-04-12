@@ -1,0 +1,90 @@
+@startuml
+
+skinparam style strictuml
+skinparam linetype ortho
+skinparam sameClassWidth true
+skinparam nodesep 60
+
+hide empty members
+
+class Dispatcher {
+  select()
+  handle_events()
+  register_handler()
+  remove_handler()
+}
+
+' Create 3 separate Transport Handle boxes to match the visual layout exactly
+class "Transport\nHandle" as TH_Conn
+class "Transport\nHandle" as TH_SH
+class "Transport\nHandle" as TH_Acc
+
+class Connector {
+  Connector()
+  connect()
+  complete()
+  handle_event()
+}
+
+class "Concrete\nConnector" as ConcreteConnector
+
+class "Service\nHandler" as ServiceHandler {
+  peer_stream_
+  open()
+  handle_event()
+  set_handle()
+}
+
+class "Concrete\nService\nHandler A" as CSH_A
+class "Concrete\nService\nHandler B" as CSH_B
+
+class Acceptor {
+  peer_acceptor_
+  Acceptor()
+  accept()
+  handle_event()
+}
+
+class "Concrete\nAcceptor" as ConcreteAcceptor
+
+' --- Vertical / Core Relationships ---
+
+' Dispatcher uses Transport Handles
+Dispatcher -- "*" TH_Conn : uses >
+Dispatcher -- "*" TH_SH : uses >
+Dispatcher -- "*" TH_Acc : uses >
+
+' Handlers own Transport Handles
+Connector -up- TH_Conn : owns
+ServiceHandler -up- TH_SH : owns
+Acceptor -up- TH_Acc : owns
+
+' Dispatcher notifies Handlers
+Dispatcher ..> "*" Connector : notifies
+Dispatcher ..> "*" ServiceHandler : notifies
+Dispatcher ..> "*" Acceptor : notifies
+
+' Acceptor/Connector interactions with Service Handlers
+Acceptor .left.> ServiceHandler : <<creates>>
+Connector ..> "*" CSH_A : <<activate>>
+Acceptor ..> "*" CSH_B : <<activate>>
+
+' --- Inheritance ---
+Connector <|-- ConcreteConnector
+ServiceHandler <|-- CSH_A
+ServiceHandler <|-- CSH_B
+Acceptor <|-- ConcreteAcceptor
+
+' --- Structural Hints for Layout ---
+' Force the columns to align left-to-right
+TH_Conn -[hidden]right- TH_SH
+TH_SH -[hidden]right- TH_Acc
+
+Connector -[hidden]right- ServiceHandler
+ServiceHandler -[hidden]right- Acceptor
+
+ConcreteConnector -[hidden]right- CSH_A
+CSH_A -[hidden]right- CSH_B
+CSH_B -[hidden]right- ConcreteAcceptor
+
+@enduml
