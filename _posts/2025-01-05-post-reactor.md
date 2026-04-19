@@ -27,8 +27,8 @@ tags:
 
 ## Overview
 This post covers the following topics:
-- The **Reactor pattern**  using a single event loop to demultiplex I/O events and dispatch them to registered handlers.
-- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity. The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern)
+- The **Reactor pattern**, which uses a single event loop to demultiplex I/O events and dispatch them to registered handlers.
+- A **simplified** implementation inspired by the [Adaptive Communication Environment (ACE)](https://www.dre.vanderbilt.edu/~schmidt/ACE.html), focusing on the essentials rather than production complexity. The source code is available at [https://github.com/yjung93/study_ACE_design_pattern](https://github.com/yjung93/study_ACE_design_pattern).
 
 
 ## Reactor Pattern [[POSA2](/references/post-references)]
@@ -39,27 +39,26 @@ The Reactor pattern is a design pattern for handling service requests delivered 
 - **Maintainability**: Promotes modular and decoupled code design.
 
 ### Background
-Event-driven applications in distributed systems, even if originally designed to process service requests synchronously and serially, must often process multiple service requests simultaneously. The multiple concurrent events must be demultiplexed and dispatched to the appropriate application service handlers.
 
-The following forces must be resolved to address this problem:
-- To improve scalability and latency, the application should not block the thread when an event is triggered or exclude events from other sources.
-- To maximize throughput, context switching, unnecessary synchronization, and data movement among CPUs should be avoided.
-- Adding and improving services within the existing event demultiplexing and dispatching system should require minimal effort.
-- The application's implementation should be decoupled from the complexities of multi-threading and synchronization.
+Applications in distributed systems, which process multiple service requests simultaneously—even if they are designed to process those requests serially—must efficiently demultiplex and dispatch events to their appropriate service implementations. To resolve this problem, the following forces must be addressed:
+
+- The application should not block on any triggered event or exclude events from other sources. Blocking the thread when an event is triggered can degrade the server's responsiveness to clients.
+- Adding, removing, or improving services in an existing event demultiplexing and dispatching system should require minimal effort.
+- The application's implementation should be decoupled from the complexities of multithreading and synchronization.
 
 ### Solution
 
 - Synchronously wait for events from different sources.
-- Apply a mechanism that demultiplexes and dispatches events to the application services that process them.
+- Apply a mechanism that demultiplexes and dispatches events to the corresponding application services.
 - Decouple the demultiplexing and dispatching mechanisms from the application service implementation.
 
 In Detail:
 - An application implements a separate event handler for each service. 
-- Event handlers are registered with the Reactor.
+- It registers these event handlers with the Reactor.
 - The Reactor uses a synchronous event demultiplexer to wait for an indication that an event has occurred.
 - The event demultiplexer notifies the Reactor when these events occur.
 - The Reactor dispatches the event to the associated registered event handler.
-- The event handler performs its application service.
+- Finally, the event handler performs its application-specific service.
 
 ### Structure
 - **Handles**: Identify event sources such as network connections or open files. These are provided by the operating system.
